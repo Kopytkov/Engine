@@ -12,7 +12,27 @@ add_library(glad STATIC lib/glad/src/glad.c)
 target_include_directories(glad PUBLIC lib/glad/include)
 set_target_properties(glad PROPERTIES LINKER_LANGUAGE C)
 
+# Добавление nlohmann/json
+include(FetchContent)
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.11.3
+)
+FetchContent_MakeAvailable(json)
+
 # Основной исполняемый файл
-add_executable(Engine src/main.cpp src/shader.cpp)
-target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
+add_executable(Engine 
+    src/main.cpp 
+    src/shader.cpp
+    src/json_parser.cpp
+)
+target_link_libraries(Engine 
+    PRIVATE 
+        SDL2::SDL2 
+        SDL2::SDL2main 
+        glm::glm 
+        glad
+        nlohmann_json::nlohmann_json
+)
 target_include_directories(Engine PRIVATE include)
