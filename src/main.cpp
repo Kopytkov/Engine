@@ -3,6 +3,7 @@
 #include <iostream>
 #include <direct.h> // Для _chdir на Windows
 #include "shader.h"
+#include "json_parser.h"
 
 int main(int argc, char* argv[]) {
     // Инициализация SDL
@@ -56,6 +57,18 @@ int main(int argc, char* argv[]) {
         if (_chdir(project_root.c_str()) != 0) {
             std::cerr << "Failed to set working directory to: " << project_root << std::endl;
         }
+    }
+
+    // Тест JSON-парсера
+    try {
+        Object obj = parseObject("assets/object.json");
+        std::cout << "Parsed object: " << obj.name << "\n";
+        std::cout << "Position: (" << obj.pos.x << ", " << obj.pos.y << ", " << obj.pos.z << ")\n";
+        std::cout << "Scale: (" << obj.scale.x << ", " << obj.scale.y << ", " << obj.scale.z << ")\n";
+        std::cout << "Texture: " << obj.texture << "\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
     }
 
     // Загрузка шейдеров
