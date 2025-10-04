@@ -1,4 +1,8 @@
-#include <SDL2/SDL.h>
+
+#include "bmp/bmp.h"
+#include "render/render.h"
+
+/*#include <SDL2/SDL.h>
 #include <glad/glad.h>
 #include <iostream>
 #include <direct.h> // Для _chdir на Windows
@@ -14,7 +18,8 @@ int main(int argc, char* argv[]) {
     // Настройка OpenGL
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+SDL_GL_CONTEXT_PROFILE_CORE);
 
     // Создание окна 800x600
     SDL_Window* window = SDL_CreateWindow(
@@ -30,10 +35,8 @@ int main(int argc, char* argv[]) {
     // Создание контекста
     SDL_GLContext context = SDL_GL_CreateContext(window);
     if (!context) {
-        std::cerr << "SDL_GL_CreateContext failed: " << SDL_GetError() << std::endl;
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return -1;
+        std::cerr << "SDL_GL_CreateContext failed: " << SDL_GetError() <<
+std::endl; SDL_DestroyWindow(window); SDL_Quit(); return -1;
     }
 
     // Инициализация glad
@@ -54,7 +57,8 @@ int main(int argc, char* argv[]) {
         project_root = project_root.substr(0, project_root.find_last_of("\\/"));
         SDL_free(base_path);
         if (_chdir(project_root.c_str()) != 0) {
-            std::cerr << "Failed to set working directory to: " << project_root << std::endl;
+            std::cerr << "Failed to set working directory to: " << project_root
+<< std::endl;
         }
     }
 
@@ -83,4 +87,23 @@ int main(int argc, char* argv[]) {
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
+}*/
+
+int main() {
+  Camera camera(vec3(0, -20, 5), vec3(0, 1, 0), vec3(0, 0, 1), 100, 100, 40,
+                75);
+
+  Scene scene;
+  scene.AddObject(std::make_unique<Sphere>(vec3(0, 0, 3), 1.0f));
+
+  RawImage image(128, 128);
+  Renderer renderer;
+
+  renderer.Render(camera, scene, image);
+
+  BMP bmp(image);
+  std::ofstream out("C:/temp/1.bmp");
+  bmp.Write(out);
+
+  return 0;
 }
