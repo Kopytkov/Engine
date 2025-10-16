@@ -1,0 +1,42 @@
+#include "scene.h"
+
+#include <utility>
+
+Scene::Scene() = default;
+
+Scene::~Scene() = default;
+
+void Scene::AddObject(std::unique_ptr<SceneObject> object) {
+  objects_.push_back(std::move(object));
+}
+
+const std::vector<std::unique_ptr<SceneObject>> &Scene::GetObjects() const {
+  return objects_;
+}
+
+std::optional<Hit> Scene::GetHit(const Ray &ray) const {
+  vec3 position = ray.position;
+
+  for (uint32_t hop = ray.numOfStep; hop < kMaxStep; ++hop) {
+    const float d = GetDistance(position);
+    if (d < kMinDistance) {
+      Hit hit;
+      hit.position = position;
+      return hit;
+    }
+    position = position + ray.direction * d;
+  }
+  return std::nullopt;
+}
+
+float Scene::GetDistance(const vec3 &position) const {
+  float result = kMaxDistance;
+
+  for (const auto &object : objects_) {
+    const float d = object->SDF(position);
+    if (d < result) {
+      result = d;
+    }
+  }
+  return result;
+}
