@@ -90,20 +90,20 @@ std::endl; SDL_DestroyWindow(window); SDL_Quit(); return -1;
 }*/
 
 int main() {
-  Camera camera(vec3(0, -20, 5), vec3(0, 1, 0), vec3(0, 0, 1), 100, 100, 40,
+
+    RawImage image(100, 100);
+    Camera camera(vec3(0, -20, 0), vec3(0, 1, 0), vec3(0, 0, 1), image.GetWidth(), image.GetHeight(), 40,
                 75);
 
-  Scene scene;
-  scene.AddObject(std::make_unique<Sphere>(vec3(0, 0, 3), 1.0f));
+    Scene scene;
+    scene.AddObject(std::make_unique<Sphere>(vec3(0, 0, 0), 5.0f));
 
-  RawImage image(128, 128);
-  Renderer renderer;
+    Renderer renderer;
+    renderer.Render(camera, scene, image);
 
-  renderer.Render(camera, scene, image);
+    BMP bmp(image);
+    std::ofstream out("D:\\cpp_proj\\Engine\\temp1.bmp");
+    bmp.Write(out);
 
-  BMP bmp(image);
-  std::ofstream out("C:/temp/1.bmp");
-  bmp.Write(out);
-
-  return 0;
+    return 0;
 }

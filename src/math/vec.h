@@ -59,6 +59,15 @@ public:
 };
 
 template <typename T, int N>
+vec<T, N> operator+(const vec<T, N> &v1, const vec<T, N> &v2) {
+  vec<T, N> res;
+  for (int i = 0; i < N; i++) {
+    res[i] = v1[i] + v2[i];
+  }
+  return res;
+}
+
+template <typename T, int N>
 vec<T, N> operator-(const vec<T, N> &v1, const vec<T, N> &v2) {
   vec<T, N> res;
   for (int i = 0; i < N; i++) {
