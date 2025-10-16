@@ -65,6 +65,12 @@ void Shader::use() const {
     }
 }
 
+// Устанавливает значение uniform-переменной типа int
+// Используется для указания номера текстурного юнита
+void Shader::setInt(const std::string& name, int value) const {
+    glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
+}
+
 std::string Shader::readFile(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {

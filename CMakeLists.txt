@@ -4,8 +4,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Поиск библиотек
-#find_package(SDL2 CONFIG REQUIRED)
-#find_package(glm CONFIG REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 # Добавление glad
 add_library(glad STATIC lib/glad/src/glad.c)
@@ -17,6 +17,8 @@ add_executable(Engine
  src/main.cpp
  src/bmp/bmp.h
  src/bmp/bmp.cpp
+ src/gl/shader.h
+ src/gl/shader.cpp
  src/math/vec.h
  src/math/vec_functions.h
  src/render/camera.h
@@ -41,5 +43,5 @@ add_executable(Engine
  src/render/light_source_global.h
  src/render/light_source_global.cpp
 )
-#target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
+target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
 target_include_directories(Engine PRIVATE src)
