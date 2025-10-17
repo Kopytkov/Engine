@@ -16,6 +16,7 @@ class SceneFactory {
 struct Hit {
   vec3 position;
   vec3 normal;
+  SceneObject* obj;
 };
 
 class Scene {
@@ -31,5 +32,5 @@ public:
 private:
   std::vector<std::unique_ptr<SceneObject>> objects_;
 
-  float GetDistance(const vec3 &position) const;
+  std::tuple<float, SceneObject*> GetDistance(const vec3 &position) const;
 };
