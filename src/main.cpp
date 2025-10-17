@@ -97,6 +97,7 @@ int main() {
 
     Scene scene;
     scene.AddObject(std::make_unique<Sphere>(vec3(0, 0, 0), 5.0f));
+    scene.AddLight(std::make_unique<PointLightSource>(vec3(10, -10, 10), 1.0f, RGB{255, 255, 255}));
 
     Renderer renderer;
     renderer.Render(camera, scene, image);

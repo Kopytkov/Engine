@@ -34,6 +34,12 @@ add_executable(Engine
  src/render/scene_object_sphere.cpp
  src/render/scene.h
  src/render/scene.cpp
+ src/render/light_source.h
+ src/render/light_source.cpp
+ src/render/light_source_point.h
+ src/render/light_source_point.cpp
+ src/render/light_source_global.h
+ src/render/light_source_global.cpp
 )
 #target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
 target_include_directories(Engine PRIVATE src)
