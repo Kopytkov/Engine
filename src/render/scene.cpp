@@ -10,8 +10,16 @@ void Scene::AddObject(std::unique_ptr<SceneObject> object) {
   objects_.push_back(std::move(object));
 }
 
+void Scene::AddLight(std::unique_ptr<LightSource> light) {
+  lights_.push_back(std::move(light));
+}
+
 const std::vector<std::unique_ptr<SceneObject>> &Scene::GetObjects() const {
   return objects_;
+}
+
+const std::vector<std::unique_ptr<LightSource>> &Scene::GetLights() const {
+  return lights_;
 }
 
 std::optional<Hit> Scene::GetHit(const Ray &ray) const {
@@ -24,7 +32,7 @@ std::optional<Hit> Scene::GetHit(const Ray &ray) const {
       hit.position = position;
       hit.obj = obj;
       hit.normal = obj->getNormal(position);
-      
+
       return hit;
     }
     position = position + ray.direction * d;
