@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "math/vec_functions.h"
 
 void Renderer::Render(const Camera &camera, const Scene &scene,
                       RawImage &out_image) {
@@ -7,7 +8,13 @@ void Renderer::Render(const Camera &camera, const Scene &scene,
       auto [imgx, imgy, ray] = camera.GetRay(x, y);
       
       if (auto hit = scene.GetHit(ray); hit) {
-        out_image.SetPixel(imgx, imgy, {255, 255, 255});
+        RGB color{0, 0, 0};
+
+        for(const auto &light : scene.GetLights()){
+          color = sumRGB(color, RGB{255, 255, 255}*dot(hit->normal,  light->lightDirection(hit->position)));
+        }
+
+        out_image.SetPixel(imgx, imgy, color);
       }
     }
   }

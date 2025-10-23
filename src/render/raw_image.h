@@ -14,6 +14,10 @@ union RGB {
 };
 #pragma pack(pop)
 
+RGB sumRGB(const RGB& col1, const RGB& col2);
+RGB operator*(const RGB& color, float brightness);
+RGB operator*(float brightness, const RGB& color);
+
 class RawImage {
 public:
   RawImage(uint32_t width, uint32_t height);
