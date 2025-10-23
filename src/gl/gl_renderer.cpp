@@ -82,14 +82,14 @@ void GLRenderer::SetupQuad() {
     glBindVertexArray(0);
 }
 
-void GLRenderer::Render(const Shader& shader, const RawImage& image) {
+void GLRenderer::Render(const Shader& shader, const Texture& texture) {
     // Очистка цветового буфера (экран становится чёрным)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  // Установка цвета очистки: чёрный
     glClear(GL_COLOR_BUFFER_BIT);          // Выполнение очистки
 
     // === РЕНДЕРИНГ ТЕКСТУРЫ НА КВАД ===
     shader.use();  // Активация шейдерной программы
-    BindTexture(image);
+    BindTexture(texture);
     // Установка uniform-переменной в шейдере: texture1 использует юнит 0
     shader.setInt("texture1", 0);
 
@@ -100,8 +100,8 @@ void GLRenderer::Render(const Shader& shader, const RawImage& image) {
     glBindVertexArray(0);  // Отвязка VAO
 }
 
-void GLRenderer::BindTexture(const RawImage& image) {
+void GLRenderer::BindTexture(const Texture& texture) {
     // Активация текстурного юнита 0 (GL_TEXTURE0) — OpenGL поддерживает несколько юнитов
     glActiveTexture(GL_TEXTURE0);
-    image.bindTexture();  // Привязка текстуры из RawImage к активному юниту
+    texture.bindTexture();  // Привязка текстуры к активному юниту
 }

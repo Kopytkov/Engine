@@ -1,7 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
-#include "../render/raw_image.h"
+#include "../render/texture.h"
 #include "shader.h"
 
 class GLRenderer {
@@ -10,8 +10,8 @@ public:
     ~GLRenderer();
 
     bool Initialize();
-    void Render(const Shader& shader, const RawImage& image);
-    void BindTexture(const RawImage& image);
+    void Render(const Shader& shader, const Texture& texture);
+    void BindTexture(const Texture& texture);
 
 private:
     SDL_GLContext glContext_;

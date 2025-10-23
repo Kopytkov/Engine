@@ -5,6 +5,7 @@
 #include "gl/shader.h"
 #include "gl/gl_renderer.h"
 #include "render/raw_image.h"
+#include "render/texture.h"
 
 int main(int argc, char* argv[]) {
     // Инициализация SDL
@@ -55,8 +56,9 @@ int main(int argc, char* argv[]) {
     bmp.Write(out);
     out.close();
 
-    // Создание OpenGL-текстуры из RawImage
-    image.createTexture();
+    // Создание OpenGL-текстуры
+    Texture texture(image);
+    texture.createTexture();
 
     // === ОСНОВНОЙ ЦИКЛ РЕНДЕРИНГА ===
     bool running = true;
@@ -69,7 +71,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        glRenderer.Render(shader, image);
+        glRenderer.Render(shader, texture);
         // Обмен буферов: вывод кадра на экран
         SDL_GL_SwapWindow(window);
     }
