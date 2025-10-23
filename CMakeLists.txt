@@ -19,6 +19,8 @@ add_executable(Engine
  src/bmp/bmp.cpp
  src/gl/shader.h
  src/gl/shader.cpp
+ src/gl/gl_renderer.h
+ src/gl/gl_renderer.cpp
  src/math/vec.h
  src/math/vec_functions.h
  src/render/camera.h
