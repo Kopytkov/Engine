@@ -6,8 +6,8 @@
 #include "scene.h"
 
 class Renderer {
-public:
-  void Render(const Camera &camera, const Scene &scene, RawImage &out_image);
+ public:
+  void Render(const Camera& camera, const Scene& scene, RawImage& out_image);
 
-private:
+ private:
 };
