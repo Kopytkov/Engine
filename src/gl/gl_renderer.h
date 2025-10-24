@@ -5,17 +5,17 @@
 #include "shader.h"
 
 class GLRenderer {
-public:
-    GLRenderer(SDL_Window* window);
-    ~GLRenderer();
+ public:
+  GLRenderer(SDL_Window* window);
+  ~GLRenderer();
 
-    bool Initialize();
-    void Render(const Shader& shader, const Texture& texture);
-    void BindTexture(const Texture& texture);
+  bool Initialize();
+  void Render(const Shader& shader, const Texture& texture);
+  void BindTexture(const Texture& texture);
 
-private:
-    SDL_GLContext glContext_;
-    GLuint VAO_, VBO_, EBO_;
+ private:
+  SDL_GLContext glContext_;
+  GLuint VAO_, VBO_, EBO_;
 
-    void SetupQuad();
+  void SetupQuad();
 };

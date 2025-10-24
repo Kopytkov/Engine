@@ -3,20 +3,23 @@
 #include "raw_image.h"
 
 class Texture {
-public:
-    Texture(const RawImage& image);
-    ~Texture();
+ public:
+  explicit Texture(const RawImage& image);
+  ~Texture();
 
-    // Создаёт OpenGL-текстуру из данных изображения
-    void createTexture();
+  // Создаёт OpenGL-текстуру из данных изображения
+  void createTexture();
 
-    // Привязывает созданную текстуру к текущему контексту OpenGL
-    void bindTexture() const;
+  // Обновляет данные текстуры из переданного RawImage
+  void updateTexture(const RawImage& image);
 
-    // Возвращает ID текстуры для использования в рендеринге
-    GLuint getTextureID() const { return textureID_; }
+  // Привязывает созданную текстуру к текущему контексту OpenGL
+  void bindTexture() const;
 
-private:
-    const RawImage& image_; // Ссылка на RawImage для доступа к данным
-    GLuint textureID_; // ID OpenGL-текстуры
+  // Возвращает ID текстуры для использования в рендеринге
+  GLuint getTextureID() const { return textureID_; }
+
+ private:
+  const RawImage& image_;  // Ссылка на RawImage для доступа к данным
+  GLuint textureID_;       // ID OpenGL-текстуры
 };

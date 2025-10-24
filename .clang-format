@@ -1,0 +1,5 @@
+---
+BasedOnStyle: Chromium
+Standard: Cpp11
+InsertBraces: true
+InsertNewlineAtEOF: true
