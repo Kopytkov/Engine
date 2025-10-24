@@ -4,13 +4,13 @@
 #include <optional>
 #include <vector>
 
+#include "light_source.h"
 #include "math/vec.h"
 #include "ray.h"
 #include "scene_object.h"
-#include "light_source.h"
 
 class SceneFactory {
-  static std::unique_ptr<SceneObject> CreateSphere(const vec3 &position,
+  static std::unique_ptr<SceneObject> CreateSphere(const vec3& position,
                                                    float r);
 };
 
@@ -21,20 +21,20 @@ struct Hit {
 };
 
 class Scene {
-public:
+ public:
   Scene();
   ~Scene();
 
   void AddObject(std::unique_ptr<SceneObject> object);
   void AddLight(std::unique_ptr<LightSource> light);
-  const std::vector<std::unique_ptr<SceneObject>> &GetObjects() const;
-  const std::vector<std::unique_ptr<LightSource>> &GetLights() const;
+  const std::vector<std::unique_ptr<SceneObject>>& GetObjects() const;
+  const std::vector<std::unique_ptr<LightSource>>& GetLights() const;
 
-  std::optional<Hit> GetHit(const Ray &ray) const;
+  std::optional<Hit> GetHit(const Ray& ray) const;
 
-private:
+ private:
   std::vector<std::unique_ptr<SceneObject>> objects_;
   std::vector<std::unique_ptr<LightSource>> lights_;
 
-  std::tuple<float, SceneObject*> GetDistance(const vec3 &position) const;
+  std::tuple<float, SceneObject*> GetDistance(const vec3& position) const;
 };

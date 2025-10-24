@@ -34,15 +34,15 @@ struct bmpInfo {
 class RawImage;
 
 class BMP {
-public:
-  BMP(const RawImage &raw);
+ public:
+  BMP(const RawImage& raw);
 
-  const bmpInfo &getInfo() const;
+  const bmpInfo& getInfo() const;
 
-  void Write(std::ofstream &outfile) const;
+  void Write(std::ofstream& outfile) const;
 
-private:
+ private:
   bmpInfo info_;
-  const RawImage &raw_data_;
+  const RawImage& raw_data_;
   std::vector<uint8_t> dib;
 };

@@ -14,15 +14,15 @@ void Scene::AddLight(std::unique_ptr<LightSource> light) {
   lights_.push_back(std::move(light));
 }
 
-const std::vector<std::unique_ptr<SceneObject>> &Scene::GetObjects() const {
+const std::vector<std::unique_ptr<SceneObject>>& Scene::GetObjects() const {
   return objects_;
 }
 
-const std::vector<std::unique_ptr<LightSource>> &Scene::GetLights() const {
+const std::vector<std::unique_ptr<LightSource>>& Scene::GetLights() const {
   return lights_;
 }
 
-std::optional<Hit> Scene::GetHit(const Ray &ray) const {
+std::optional<Hit> Scene::GetHit(const Ray& ray) const {
   vec3 position = ray.position;
 
   for (uint32_t hop = ray.numOfStep; hop < kMaxStep; ++hop) {
@@ -40,10 +40,10 @@ std::optional<Hit> Scene::GetHit(const Ray &ray) const {
   return std::nullopt;
 }
 
-std::tuple<float, SceneObject*> Scene::GetDistance(const vec3 &position) const {
+std::tuple<float, SceneObject*> Scene::GetDistance(const vec3& position) const {
   float result = kMaxDistance;
   SceneObject* nearestObj;
-  for (const auto &object : objects_) {
+  for (const auto& object : objects_) {
     const float d = object->SDF(position);
     if (d < result) {
       result = d;

@@ -1,12 +1,11 @@
 #include "light_source.h"
 
-class PointLightSource: public LightSource{
-    vec3 position;
+class PointLightSource : public LightSource {
+  vec3 position;
 
-    public:
+ public:
+  PointLightSource(vec3 pos, float br, RGB col);
 
-    PointLightSource(vec3 pos, float br, RGB col);
-
-    vec3 getPosition();
-    vec3 lightDirection(vec3 point) const override;
+  vec3 getPosition();
+  vec3 lightDirection(vec3 point) const override;
 };
