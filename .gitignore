@@ -3,3 +3,4 @@ build/
 *.exe 
 *.log
 .vscode/
+*.bmp

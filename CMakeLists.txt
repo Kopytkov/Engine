@@ -19,6 +19,8 @@ add_executable(Engine
  src/bmp/bmp.cpp
  src/gl/shader.h
  src/gl/shader.cpp
+ src/gl/gl_renderer.h
+ src/gl/gl_renderer.cpp
  src/math/vec.h
  src/math/vec_functions.h
  src/render/camera.h
@@ -42,6 +44,8 @@ add_executable(Engine
  src/render/light_source_point.cpp
  src/render/light_source_global.h
  src/render/light_source_global.cpp
+ src/render/texture.h
+ src/render/texture.cpp
 )
 target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
 target_include_directories(Engine PRIVATE src)
