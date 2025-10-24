@@ -14,7 +14,7 @@ union RGB {
 };
 #pragma pack(pop)
 
-RGB sumRGB(const RGB& col1, const RGB& col2);
+RGB stretchRGB(const RGB& col1, const RGB& col2);
 RGB operator*(const RGB& color, float brightness);
 RGB operator*(float brightness, const RGB& color);
-RGB cutRGB(const RGB& color, const RGB& light);
+RGB clampRGB(const RGB& color, const RGB& light);
