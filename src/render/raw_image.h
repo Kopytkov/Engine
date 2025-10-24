@@ -3,24 +3,7 @@
 #include <string>
 #include <vector>
 #include "../bmp/bmp.h"
-
-// Структуры для работы с цветом пикселя в формате RGB
-#pragma pack(push)
-#pragma pack(1)
-union RGB {
-  struct {
-    uint8_t r;  // Красный канал
-    uint8_t g;  // Зелёный канал
-    uint8_t b;  // Синий канал
-  };
-  uint8_t color[3] = {0};  // Альтернативный доступ к цветам как к массиву
-};
-#pragma pack(pop)
-
-RGB sumRGB(const RGB& col1, const RGB& col2);
-RGB operator*(const RGB& color, float brightness);
-RGB operator*(float brightness, const RGB& color);
-RGB cutRGB(const RGB& color, const RGB& light);
+#include "RGB.h"
 
 // Загружает данные изображения из BMP-файла, используя структуры из bmp.h
 RawImage loadFromBMP(const std::string& filename);

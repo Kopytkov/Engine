@@ -46,6 +46,8 @@ add_executable(Engine
  src/render/light_source_global.cpp
  src/render/texture.h
  src/render/texture.cpp
-)
+ src/render/RGB.h
+ src/render/RGB.cpp
+ )
 target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
 target_include_directories(Engine PRIVATE src)
