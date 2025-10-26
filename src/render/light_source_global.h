@@ -1,12 +1,11 @@
 #include "light_source.h"
 
-class GlobalLight: public LightSource{
-    vec3 direction;
+class GlobalLight : public LightSource {
+  vec3 direction;
 
-    public:
+ public:
+  GlobalLight(vec3 _direction, float _brightness, RGB _color);
 
-    GlobalLight(vec3 _direction, float _brightness, RGB _color);
-
-    vec3 getDirection() const;
-    vec3 lightDirection(vec3 point) const override;
+  vec3 getDirection() const;
+  vec3 lightDirection(vec3 point) const override;
 };

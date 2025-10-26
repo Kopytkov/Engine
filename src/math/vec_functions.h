@@ -5,7 +5,7 @@
 #include <cmath>
 
 template <typename T, int N>
-vec<T, N> min(const vec<T, N> &a, const vec<T, N> &b) {
+vec<T, N> min(const vec<T, N>& a, const vec<T, N>& b) {
   vec<T, N> res;
   for (int i = 0; i < N; i++) {
     if (a[i] < b[i]) {
@@ -17,7 +17,8 @@ vec<T, N> min(const vec<T, N> &a, const vec<T, N> &b) {
   return res;
 }
 
-template <typename T, int N> vec<T, N> min(const vec<T, N> &a, const float &b) {
+template <typename T, int N>
+vec<T, N> min(const vec<T, N>& a, const float& b) {
   vec<T, N> res;
   for (int i = 0; i < N; i++) {
     if (a[i] < b) {
@@ -30,7 +31,7 @@ template <typename T, int N> vec<T, N> min(const vec<T, N> &a, const float &b) {
 }
 
 template <typename T, int N>
-vec<T, N> max(const vec<T, N> &a, const vec<T, N> &b) {
+vec<T, N> max(const vec<T, N>& a, const vec<T, N>& b) {
   vec<T, N> res;
   for (int i = 0; i < N; i++) {
     if (a[i] > b[i]) {
@@ -42,7 +43,8 @@ vec<T, N> max(const vec<T, N> &a, const vec<T, N> &b) {
   return res;
 }
 
-template <typename T, int N> vec<T, N> max(const vec<T, N> &a, const float &b) {
+template <typename T, int N>
+vec<T, N> max(const vec<T, N>& a, const float& b) {
   vec<T, N> res;
   for (int i = 0; i < N; i++) {
     if (a[i] > b) {
@@ -55,32 +57,34 @@ template <typename T, int N> vec<T, N> max(const vec<T, N> &a, const float &b) {
 }
 
 template <typename T, int N>
-vec<T, N> clamp(const vec<T, N> &a, const vec<T, N> &minVal,
-                const vec<T, N> &maxVal) {
+vec<T, N> clamp(const vec<T, N>& a,
+                const vec<T, N>& minVal,
+                const vec<T, N>& maxVal) {
   return min(max(a, minVal), maxVal);
 }
 
 template <typename T, int N>
-vec<T, N> clamp(const vec<T, N> &a, const float &minVal, const float &maxVal) {
+vec<T, N> clamp(const vec<T, N>& a, const float& minVal, const float& maxVal) {
   return min(max(a, minVal), maxVal);
 }
 
 template <typename T, int N>
-vec<T, N> mix(const vec<T, N> &a, const vec<T, N> &b, const vec<T, N> &wb) {
+vec<T, N> mix(const vec<T, N>& a, const vec<T, N>& b, const vec<T, N>& wb) {
   return a * (vec<T, N>(1) - wb) + b * wb;
 }
 
 template <typename T, int N>
-vec<T, N> mix(const vec<T, N> &a, const vec<T, N> &b, const float &wb) {
+vec<T, N> mix(const vec<T, N>& a, const vec<T, N>& b, const float& wb) {
   return a * vec<T, N>(1 - wb) + b * vec<T, N>(wb);
 }
 
-inline vec3 cross(const vec3 &a, const vec3 &b) {
+inline vec3 cross(const vec3& a, const vec3& b) {
   return vec3(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2],
               a[0] * b[1] - a[1] * b[0]);
 }
 
-template <typename T, int N> float dot(const vec<T, N> &a, const vec<T, N> &b) {
+template <typename T, int N>
+float dot(const vec<T, N>& a, const vec<T, N>& b) {
   float res = 0;
   for (int i = 0; i < N; i++) {
     res += float(a[i] * b[i]);
@@ -88,20 +92,23 @@ template <typename T, int N> float dot(const vec<T, N> &a, const vec<T, N> &b) {
   return res;
 }
 
-template <typename T, int N> float length(const vec<T, N> &a) {
+template <typename T, int N>
+float length(const vec<T, N>& a) {
   return std::sqrt(dot(a, a));
 }
 
 template <typename T, int N>
-float distance(const vec<T, N> &a, const vec<T, N> &b) {
+float distance(const vec<T, N>& a, const vec<T, N>& b) {
   return length(a - b);
 }
 
-template <typename T, int N> vec<T, N> normalize(const vec<T, N> &a) {
+template <typename T, int N>
+vec<T, N> normalize(const vec<T, N>& a) {
   return a / length(a);
 }
 
-template <typename T, int N> vec<T, N> abs(const vec<T, N> &a) {
+template <typename T, int N>
+vec<T, N> abs(const vec<T, N>& a) {
   vec<T, N> res;
   for (int i = 0; i < N; i++) {
     res[i] = std::abs(a[i]);
@@ -110,8 +117,9 @@ template <typename T, int N> vec<T, N> abs(const vec<T, N> &a) {
 }
 
 template <typename T, int N>
-vec<T, N> faceforward(const vec<T, N> &n, const vec<T, N> &i,
-                      const vec<T, N> &nRef) {
+vec<T, N> faceforward(const vec<T, N>& n,
+                      const vec<T, N>& i,
+                      const vec<T, N>& nRef) {
   if (dot(nRef, i) < 0) {
     return n;
   } else {
@@ -120,12 +128,12 @@ vec<T, N> faceforward(const vec<T, N> &n, const vec<T, N> &i,
 }
 
 template <typename T, int N>
-vec<T, N> reflect(const vec<T, N> &i, const vec<T, N> &n) {
+vec<T, N> reflect(const vec<T, N>& i, const vec<T, N>& n) {
   return i - T(2) * dot(n, i) * n;
 }
 
 template <typename T, int N>
-vec<T, N> refract(const vec<T, N> &i, const vec<T, N> &n, float r) {
+vec<T, N> refract(const vec<T, N>& i, const vec<T, N>& n, float r) {
   float d = 1.0 - r * r * (1.0 - dot(n, i) * dot(n, i));
   if (d < 0.0) {
     return vec<T, N>(0.0);

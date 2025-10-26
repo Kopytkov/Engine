@@ -1,6 +1,6 @@
 #include "RGB.h"
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
 RGB stretchRGB(const RGB& col1, const RGB& col2) {
   RGB colRes{0, 0, 0};
