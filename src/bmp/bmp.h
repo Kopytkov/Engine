@@ -44,6 +44,5 @@ class BMP {
 
  private:
   bmpInfo info_;
-  // const RawImage& raw_data_;
   std::vector<uint8_t> dib;
 };

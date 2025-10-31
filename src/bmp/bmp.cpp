@@ -3,7 +3,7 @@
 
 #include "render/raw_image.h"
 
-BMP::BMP(const RawImage &raw) /*: raw_data_(raw) */{
+BMP::BMP(const RawImage &raw){
   info_.imageInfo.fWidth = raw.GetWidth();
   info_.imageInfo.fHeight = raw.GetHeight();
   info_.fileInfo.fDataOffset = sizeof(info_.fileInfo) + sizeof(info_.imageInfo);
@@ -11,7 +11,6 @@ BMP::BMP(const RawImage &raw) /*: raw_data_(raw) */{
   info_.imageInfo.fSizeImage =
       ((info_.imageInfo.fWidth * info_.imageInfo.fBitCount + 31) / 32) * 4 *
       info_.imageInfo.fHeight;
-      // (info_.imageInfo.fWidth * 3 + 3)/4  *4 * info_.imageInfo.fHeight;
 
   info_.fileInfo.fSize =
       info_.fileInfo.fDataOffset + info_.imageInfo.fSizeImage;
@@ -35,6 +34,5 @@ void BMP::Write(std::filesystem::path& out) const {
   std::ofstream outfile(out, std::ios_base::binary);
 
   outfile.write((const char*)(&info_), sizeof(bmpInfo));
-  // outfile.write(reinterpret_cast<const char *>(raw_data_.raw_data()), info_.imageInfo.fSizeImage);
-   outfile.write((const char*)(dib.data()), dib.size());
+  outfile.write((const char*)(dib.data()), dib.size());
 }
