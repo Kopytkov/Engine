@@ -4,7 +4,8 @@
 #include "gl/gl_renderer.h"
 #include "gl/shader.h"
 #include "render/raw_image.h"
-#include "render/render.h"
+#include "render/renderer.h"
+#include "render/scene_loader.h"
 #include "render/texture.h"
 
 int main(int argc, char* argv[]) {
@@ -40,41 +41,44 @@ int main(int argc, char* argv[]) {
   // Загрузка шейдеров
   Shader shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
 
-  // Рендеринг сцены в RawImage
-  RawImage image(800, 600);
-  Camera camera(vec3(0, -20, 0), vec3(0, 1, 0), vec3(0, 0, 1), image.GetWidth(),
-                image.GetHeight(), 40, 75);
-  Scene scene;
-  scene.AddObject(std::make_unique<Sphere>(vec3(0, 0, 0), 5.0f));
-  scene.AddLight(std::make_unique<PointLightSource>(vec3(-10, -10, 10), 1.0f,
-                                                    RGB{255, 255, 255}));
-  Renderer renderer;
-  renderer.Render(camera, scene, image);
+  // === ЗАГРУЗКА СЦЕНЫ ИЗ JSON ===
+  try {
+    auto [scene, camera] = SceneLoader::load("assets/scene/billiard.json");
 
-  // Сохранение изображения в BMP файл
-  BMP bmp(image);
-  std::ofstream out("temp1.bmp");
-  bmp.Write(out);
-  out.close();
+    RawImage image(800, 600);
+    Renderer renderer;
+    renderer.Render(camera, scene, image);
 
-  // Создание OpenGL-текстуры
-  Texture texture(image);
-  texture.createTexture();
+    // Сохранение изображения в BMP файл
+    BMP bmp(image);
+    std::ofstream out("output.bmp");
+    bmp.Write(out);
+    out.close();
 
-  // === ОСНОВНОЙ ЦИКЛ РЕНДЕРИНГА ===
-  bool running = true;
-  SDL_Event event;
-  while (running) {
-    // Обработка событий SDL (закрытие окна, клавиатура и т.д.)
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        running = false;  // Выход при закрытии окна
+    // Создание OpenGL-текстуры
+    Texture texture(image);
+    texture.createTexture();
+
+    // === ОСНОВНОЙ ЦИКЛ РЕНДЕРИНГА ===
+    bool running = true;
+    SDL_Event event;
+    while (running) {
+      // Обработка событий SDL (закрытие окна, клавиатура и т.д.)
+      while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+          running = false;  // Выход при закрытии окна
+        }
       }
-    }
 
-    glRenderer.Render(shader, texture);
-    // Обмен буферов: вывод кадра на экран
-    SDL_GL_SwapWindow(window);
+      glRenderer.Render(shader, texture);
+      // Обмен буферов: вывод кадра на экран
+      SDL_GL_SwapWindow(window);
+    }
+  } catch (const std::exception& e) {
+    std::cerr << "ERROR: " << e.what() << std::endl;
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return -1;
   }
 
   // === ОЧИСТКА РЕСУРСОВ ===
