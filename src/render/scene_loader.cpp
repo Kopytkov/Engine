@@ -1,7 +1,6 @@
 #include "scene_loader.h"
 #include <array>
 #include <fstream>
-#include <nlohmann/json.hpp>
 #include "light_source_global.h"
 #include "light_source_point.h"
 #include "math/vec_functions.h"
@@ -49,6 +48,16 @@ void SceneLoader::validate(const json& j) {
   // Остальное проверяется внутри parseCamera / parseObject
 }
 
+// Вспомогательная функция для парсинга 3-х компонентного float-массива
+static std::array<float, 3> parseVec3Array(const json& j,
+                                           const std::string& errorContext) {
+  if (!j.is_array() || j.size() < 3) {
+    throw std::runtime_error("Invalid format for " + errorContext +
+                             " - must be an array of 3 numbers.");
+  }
+  return {j[0].get<float>(), j[1].get<float>(), j[2].get<float>()};
+}
+
 Camera SceneLoader::parseCamera(const json& j) {
   // === Проверка наличия обязательных полей ===
   const std::vector<std::string> required = {"position", "target", "resolution",
@@ -60,20 +69,20 @@ Camera SceneLoader::parseCamera(const json& j) {
   }
 
   // === Чтение позиции и цели ===
-  vec3 pos(j["position"][0].get<float>(), j["position"][1].get<float>(),
-           j["position"][2].get<float>());
-  vec3 target(j["target"][0].get<float>(), j["target"][1].get<float>(),
-              j["target"][2].get<float>());
+  auto pos_arr = parseVec3Array(j["position"], "camera.position");
+  vec3 pos(pos_arr[0], pos_arr[1], pos_arr[2]);
+
+  auto target_arr = parseVec3Array(j["target"], "camera.target");
+  vec3 target(target_arr[0], target_arr[1], target_arr[2]);
 
   vec3 view = normalize(target - pos);
 
   // === Up-вектор (по умолчанию: Y вверх) ===
-  std::vector<float> up_vec =
-      j.value("up", std::vector<float>{0.0f, 1.0f, 0.0f});
-  if (up_vec.size() < 3) {
-    throw std::runtime_error("Invalid: camera.up — must have 3 components");
+  std::array<float, 3> up_arr = {0.0f, 1.0f, 0.0f};  // Default
+  if (j.contains("up")) {
+    up_arr = parseVec3Array(j["up"], "camera.up");
   }
-  vec3 up(up_vec[0], up_vec[1], up_vec[2]);
+  vec3 up(up_arr[0], up_arr[1], up_arr[2]);
 
   // === Разрешение ===
   auto res = j["resolution"].get<std::array<int, 2>>();
@@ -96,27 +105,29 @@ std::unique_ptr<LightSource> SceneLoader::parseLight(const json& j) {
   std::string type = j["type"].get<std::string>();
   float br = j.value("brightness", 1.0f);
 
-  auto col_vec = j.value("color", std::vector<float>{1.0f, 1.0f, 1.0f});
-  if (col_vec.size() < 3) {
-    throw std::runtime_error("Invalid: light.color — must have 3 components");
+  // Используем тот же хелпер для цвета
+  std::array<float, 3> col_arr = {1.0f, 1.0f, 1.0f};  // Default
+  if (j.contains("color")) {
+    col_arr = parseVec3Array(j["color"], "light.color");
   }
-  RGB col = {static_cast<uint8_t>(col_vec[0] * 255),
-             static_cast<uint8_t>(col_vec[1] * 255),
-             static_cast<uint8_t>(col_vec[2] * 255)};
+
+  RGB col = {static_cast<uint8_t>(col_arr[0] * 255),
+             static_cast<uint8_t>(col_arr[1] * 255),
+             static_cast<uint8_t>(col_arr[2] * 255)};
 
   if (type == "point") {
     if (!j.contains("position")) {
       throw std::runtime_error("Missing: light.position for point light");
     }
-    vec3 pos(j["position"][0].get<float>(), j["position"][1].get<float>(),
-             j["position"][2].get<float>());
+    auto pos_arr = parseVec3Array(j["position"], "light.position");
+    vec3 pos(pos_arr[0], pos_arr[1], pos_arr[2]);
     return std::make_unique<PointLightSource>(pos, br, col);
   } else if (type == "global") {
     if (!j.contains("direction")) {
       throw std::runtime_error("Missing: light.direction for global light");
     }
-    vec3 dir(j["direction"][0].get<float>(), j["direction"][1].get<float>(),
-             j["direction"][2].get<float>());
+    auto dir_arr = parseVec3Array(j["direction"], "light.direction");
+    vec3 dir(dir_arr[0], dir_arr[1], dir_arr[2]);
     return std::make_unique<GlobalLight>(dir, br, col);
   } else {
     throw std::runtime_error("Unknown light type: " + type);
@@ -132,8 +143,9 @@ std::unique_ptr<SceneObject> SceneLoader::parseObject(const json& j) {
   }
 
   std::string type = j["type"].get<std::string>();
-  vec3 pos(j["position"][0].get<float>(), j["position"][1].get<float>(),
-           j["position"][2].get<float>());
+
+  auto pos_arr = parseVec3Array(j["position"], "object.position");
+  vec3 pos(pos_arr[0], pos_arr[1], pos_arr[2]);
 
   if (type == "sphere") {
     if (!j.contains("radius")) {
