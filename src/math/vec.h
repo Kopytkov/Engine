@@ -46,7 +46,7 @@ class vec {
     return res;
   }
 
-  vec<T, N> operator-() {
+  vec<T, N> operator-() const{
     vec res;
     for (int i = 0; i < N; i++) {
       res[i] = -this->data[i];

@@ -48,6 +48,8 @@ add_executable(Engine
  src/render/texture.cpp
  src/render/RGB.h
  src/render/RGB.cpp
+ src/render/scene_object_box.h
+ src/render/scene_object_box.cpp
  )
 target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
 target_include_directories(Engine PRIVATE src)

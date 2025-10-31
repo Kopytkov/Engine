@@ -11,7 +11,7 @@ Camera::Camera(const vec3& pos,
                float FOV) {
   position = pos;
   viewVec = normalize(view);
-  cameraUp = normalize(up - view * dot(up, view));
+  cameraUp = normalize(up - viewVec * dot(up, viewVec));
   wResolution = w;
   hResolution = h;
   pixInMillimeter = pixInMm;
