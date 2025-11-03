@@ -1,17 +1,24 @@
 #pragma once
-#include <memory>
-#include <nlohmann/json.hpp>
+
+#include <optional>
 #include <string>
 #include "camera.h"
 #include "scene.h"
 
 class SceneLoader {
  public:
-  static std::pair<Scene, Camera> load(const std::string& jsonPath);
+  // Загружает сцену с поддержкой ref
+  static SceneLoader Load(const std::string& jsonPath);
+
+  // Получение данных
+  const Scene& GetScene() const& { return scene_; }
+  Scene&& GetScene() && { return std::move(scene_); }
+  std::optional<Camera> GetCamera() const { return camera_; }
 
  private:
-  static void validate(const nlohmann::json& j);
-  static Camera parseCamera(const nlohmann::json& j);
-  static std::unique_ptr<LightSource> parseLight(const nlohmann::json& j);
-  static std::unique_ptr<SceneObject> parseObject(const nlohmann::json& j);
+  SceneLoader(Scene&& scene, std::optional<Camera> camera)
+      : scene_(std::move(scene)), camera_(std::move(camera)) {}
+
+  Scene scene_;
+  std::optional<Camera> camera_;
 };

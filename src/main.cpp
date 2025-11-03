@@ -43,11 +43,20 @@ int main(int argc, char* argv[]) {
 
   // === ЗАГРУЗКА СЦЕНЫ ИЗ JSON ===
   try {
-    auto [scene, camera] = SceneLoader::load("assets/scene/billiard.json");
+    auto loader = SceneLoader::Load("assets/scene/billiard.json");
+    Scene scene = std::move(loader).GetScene();
 
     RawImage image(800, 600);
     Renderer renderer;
-    renderer.Render(camera, scene, image);
+
+    // Камера — проверяем optional
+    auto camera_opt = loader.GetCamera();
+    if (!camera_opt) {
+      throw std::runtime_error(
+          "Camera is missing in JSON, but required for rendering.");
+    }
+
+    renderer.Render(*camera_opt, scene, image);
 
     // Сохранение изображения в BMP файл
     BMP bmp(image);
