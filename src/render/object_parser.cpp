@@ -27,7 +27,6 @@ std::unique_ptr<SceneObject> ObjectParser::Parse(const json& j) {
     return std::make_unique<Sphere>(pos, r);
   }
 
-  // ← Легко добавить:
   // if (type == "cube") return std::make_unique<Cube>(...);
   // if (type == "plane") return std::make_unique<Plane>(...);
 
