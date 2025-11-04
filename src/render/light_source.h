@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>   // <-- нужно для std::unique_ptr
+#include <vector>   // <-- нужно для std::vector
+
 #include "math/vec.h"
 #include "raw_image.h"
 
