@@ -6,3 +6,4 @@
 #include "renderer.h"
 #include "scene.h"
 #include "scene_object_sphere.h"
+#include "scene_object_box.h"

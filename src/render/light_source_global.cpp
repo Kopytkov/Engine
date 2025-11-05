@@ -3,7 +3,7 @@
 
 GlobalLight::GlobalLight(vec3 _direction, float _brightness, RGB _color)
     : LightSource::LightSource(_brightness, _color) {
-  direction = _direction;
+  direction = normalize(_direction);
 }
 
 vec3 GlobalLight::getDirection() const {
@@ -11,5 +11,5 @@ vec3 GlobalLight::getDirection() const {
 }
 
 vec3 GlobalLight::lightDirection(vec3 point) const {
-  return -normalize(direction);
+  return -direction;
 }
