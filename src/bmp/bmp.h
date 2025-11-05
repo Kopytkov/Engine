@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <vector>
+#include <filesystem>
 
 #pragma pack(push, 1)
 struct bfi {
@@ -39,10 +40,9 @@ class BMP {
 
   const bmpInfo& getInfo() const;
 
-  void Write(std::ofstream& outfile) const;
+  void Write(std::filesystem::path& out) const;
 
  private:
   bmpInfo info_;
-  const RawImage& raw_data_;
   std::vector<uint8_t> dib;
 };
