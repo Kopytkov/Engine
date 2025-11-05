@@ -3,13 +3,16 @@ project(Engine LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Поиск библиотек
 find_package(SDL2 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
+# Добавление glad
 add_library(glad STATIC lib/glad/src/glad.c)
 target_include_directories(glad PUBLIC lib/glad/include)
 set_target_properties(glad PROPERTIES LINKER_LANGUAGE C)
 
+# Добавление nlohmann/json
 include(FetchContent)
 FetchContent_Declare(
     json
@@ -18,6 +21,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
+# Основной исполняемый файл
 add_executable(Engine
  src/main.cpp
  src/bmp/bmp.h
@@ -60,13 +64,11 @@ add_executable(Engine
  src/render/scene_object_box.cpp
  )
 target_link_libraries(Engine 
-    PRIVATE
-        mingw32
-        SDL2::SDL2main
-        SDL2::SDL2
-        glm::glm
-        glad
+    PRIVATE 
+        SDL2::SDL2 
+        SDL2::SDL2main 
+        glm::glm 
+        glad 
         nlohmann_json::nlohmann_json
-)
-
+    )
 target_include_directories(Engine PRIVATE src)
