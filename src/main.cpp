@@ -1,4 +1,5 @@
-#include <SDL2/SDL.h>
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 #include <iostream>
 #include "bmp/bmp.h"
 #include "gl/gl_renderer.h"
@@ -7,6 +8,7 @@
 #include "render/renderer.h"
 #include "render/scene_loader.h"
 #include "render/texture.h"
+
 
 int main(int argc, char* argv[]) {
   // Инициализация SDL
@@ -51,9 +53,10 @@ int main(int argc, char* argv[]) {
 
     // Сохранение изображения в BMP файл
     BMP bmp(image);
-    std::ofstream out("output.bmp");
-    bmp.Write(out);
-    out.close();
+    //std::ofstream out("output.bmp");
+    std::filesystem::path outputPath = "output.bmp";
+    bmp.Write(outputPath);
+    //out.close();
 
     // Создание OpenGL-текстуры
     Texture texture(image);
