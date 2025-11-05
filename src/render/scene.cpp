@@ -1,11 +1,5 @@
 #include "scene.h"
 
-#include <utility>
-
-Scene::Scene() = default;
-
-Scene::~Scene() = default;
-
 void Scene::AddObject(std::unique_ptr<SceneObject> object) {
   objects_.push_back(std::move(object));
 }

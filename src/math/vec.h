@@ -46,10 +46,10 @@ class vec {
     return res;
   }
 
-  vec<T, N> operator-() const{
-    vec res;
+  vec<T, N> operator-() const {
+    vec<T, N> res;
     for (int i = 0; i < N; i++) {
-      res[i] = -this->data[i];
+      res[i] = -data[i];
     }
     return res;
   }
@@ -111,6 +111,22 @@ vec<T, N> operator/(const vec<T, N>& v, const T& a) {
     res[i] = v[i] / a;
   }
   return res;
+}
+
+template <typename T, int N>
+vec<T, N>& operator+=(vec<T, N>& v1, const vec<T, N>& v2) {
+  for (int i = 0; i < N; i++) {
+    v1[i] += v2[i];
+  }
+  return v1;
+}
+
+template <typename T, int N>
+vec<T, N>& operator-=(vec<T, N>& v1, const vec<T, N>& v2) {
+  for (int i = 0; i < N; i++) {
+    v1[i] -= v2[i];
+  }
+  return v1;
 }
 
 template <typename T, int N>

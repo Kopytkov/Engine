@@ -10,6 +10,7 @@
 #include "scene_object.h"
 
 class SceneFactory {
+ public:
   static std::unique_ptr<SceneObject> CreateSphere(const vec3& position,
                                                    float r);
 };
@@ -22,8 +23,16 @@ struct Hit {
 
 class Scene {
  public:
-  Scene();
-  ~Scene();
+  Scene() = default;
+  ~Scene() = default;
+
+  // Запретить копирование
+  Scene(const Scene&) = delete;
+  Scene& operator=(const Scene&) = delete;
+
+  // Разрешить перемещение
+  Scene(Scene&&) = default;
+  Scene& operator=(Scene&&) = default;
 
   void AddObject(std::unique_ptr<SceneObject> object);
   void AddLight(std::unique_ptr<LightSource> light);

@@ -23,17 +23,25 @@ Camera::~Camera() = default;
 
 std::tuple<uint32_t, uint32_t, Ray> Camera::GetRay(uint32_t x,
                                                    uint32_t y) const {
-  vec3 startPixel =
-      position + screenDist * viewVec -
-      cameraUp / pixInMillimeter * (float(hResolution) / 2.0f - 0.5f) /**/
-      - cross(viewVec, cameraUp) / pixInMillimeter *
-            (float(wResolution) / 2.0f - 0.5f);
+  // Центр плоскости экрана в мире
+  vec3 screenCenter = position + screenDist * viewVec;
 
-  const Ray ray(startPixel + x / pixInMillimeter * cross(viewVec, cameraUp) +
-                    y / pixInMillimeter * cameraUp,
-                startPixel + x / pixInMillimeter * cross(viewVec, cameraUp) +
-                    y / pixInMillimeter * cameraUp - position,
-                0);
+  // Смещение от центра к левому-верхнему углу (половина экрана в мировых
+  // единицах)
+  vec3 topLeftOffset =
+      -cameraUp * (float(hResolution) / 2.0f) / pixInMillimeter -
+      cross(viewVec, cameraUp) * (float(wResolution) / 2.0f) / pixInMillimeter;
+
+  // Позиция левого-верхнего пикселя
+  vec3 topLeftPixel = screenCenter + topLeftOffset;
+
+  // Позиция текущего пикселя (через центр, +0.5f)
+  vec3 pixelWorldPos = topLeftPixel +
+                       (x + 0.5f) / pixInMillimeter * cross(viewVec, cameraUp) +
+                       (y + 0.5f) / pixInMillimeter * cameraUp;
+
+  // Луч от камеры через пиксель (раньше шёл от пикселя к камере)
+  const Ray ray(position, pixelWorldPos - position, 0);
 
   return {x, y, ray};
 }

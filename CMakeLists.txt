@@ -12,6 +12,15 @@ add_library(glad STATIC lib/glad/src/glad.c)
 target_include_directories(glad PUBLIC lib/glad/include)
 set_target_properties(glad PROPERTIES LINKER_LANGUAGE C)
 
+# Добавление nlohmann/json
+include(FetchContent)
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG v3.12.0
+)
+FetchContent_MakeAvailable(json)
+
 # Основной исполняемый файл
 add_executable(Engine
  src/main.cpp
@@ -25,6 +34,7 @@ add_executable(Engine
  src/math/vec_functions.h
  src/render/camera.h
  src/render/camera.cpp
+ src/render/material.h
  src/render/ray.h
  src/render/ray.cpp
  src/render/raw_image.h
@@ -32,6 +42,8 @@ add_executable(Engine
  src/render/render.h
  src/render/renderer.h
  src/render/renderer.cpp
+ src/render/scene_loader.h
+ src/render/scene_loader.cpp
  src/render/scene_object.h
  src/render/scene_object.cpp
  src/render/scene_object_sphere.h
@@ -51,5 +63,12 @@ add_executable(Engine
  src/render/scene_object_box.h
  src/render/scene_object_box.cpp
  )
-target_link_libraries(Engine PRIVATE SDL2::SDL2 SDL2::SDL2main glm::glm glad)
+target_link_libraries(Engine 
+    PRIVATE 
+        SDL2::SDL2 
+        SDL2::SDL2main 
+        glm::glm 
+        glad 
+        nlohmann_json::nlohmann_json
+    )
 target_include_directories(Engine PRIVATE src)
