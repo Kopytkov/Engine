@@ -60,9 +60,7 @@ int main(int argc, char* argv[]) {
 
     // Сохранение изображения в BMP файл
     BMP bmp(image);
-    std::ofstream out("output.bmp");
-    bmp.Write(out);
-    out.close();
+    bmp.Write("output.bmp");
 
     // Создание OpenGL-текстуры
     Texture texture(image);
