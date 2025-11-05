@@ -1,5 +1,6 @@
 #include "object_parser.h"
 #include "json_utils.h"
+#include "material.h"
 #include "scene_object_sphere.h"
 
 using json = nlohmann::json;
@@ -24,11 +25,30 @@ std::unique_ptr<SceneObject> ObjectParser::Parse(const json& j) {
     if (r <= 0) {
       throw std::runtime_error("Invalid radius");
     }
-    return std::make_unique<Sphere>(pos, r);
-  }
 
-  // if (type == "cube") return std::make_unique<Cube>(...);
-  // if (type == "plane") return std::make_unique<Plane>(...);
+    // Парсим материал
+    Material mat;
+    if (j.contains("material")) {
+      const auto& m = j["material"];
+      if (m.contains("color")) {
+        auto c = m["color"];
+        mat.base_color = RGB{static_cast<uint8_t>(c[0].get<float>() * 255),
+                             static_cast<uint8_t>(c[1].get<float>() * 255),
+                             static_cast<uint8_t>(c[2].get<float>() * 255)};
+      }
+      if (m.contains("reflectivity")) {
+        mat.reflectivity = m["reflectivity"];
+      }
+      if (m.contains("transparency")) {
+        mat.transparency = m["transparency"];
+      }
+      if (m.contains("refraction")) {
+        mat.refraction = m["refraction"];
+      }
+    }
+
+    return std::make_unique<Sphere>(pos, r, mat);
+  }
 
   throw std::runtime_error("Unknown object type: " + type);
 }

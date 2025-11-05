@@ -39,32 +39,26 @@ void Texture::createTexture() {
 
 // Обновляет данные текстуры из переданного RawImage
 void Texture::updateTexture(const RawImage& image) {
+  image_ = image;  // копируем данные
+
   if (textureID_ == 0) {
-    return;  // Текстура ещё не создана
+    createTexture();  // если текстура ещё не создана
+    return;
   }
 
-  // Проверка соответствия размеров
+  glBindTexture(GL_TEXTURE_2D, textureID_);
+
   if (image.GetWidth() != image_.GetWidth() ||
       image.GetHeight() != image_.GetHeight()) {
-    // Если размеры не совпадают, нужно пересоздать текстуру
-    glDeleteTextures(1, &textureID_);
-    glGenTextures(1, &textureID_);
-    glBindTexture(GL_TEXTURE_2D, textureID_);
+    // Размер изменился - пересоздаём
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.GetWidth(), image.GetHeight(),
                  0, GL_BGR, GL_UNSIGNED_BYTE, image.raw_data());
-    // Повторная настройка параметров
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   } else {
-    // Обновление данных текстуры
-    glBindTexture(GL_TEXTURE_2D, textureID_);
+    // Тот же размер - обновляем
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.GetWidth(), image.GetHeight(),
                     GL_BGR, GL_UNSIGNED_BYTE, image.raw_data());
   }
 
-  // Отвязывание текстуры
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
