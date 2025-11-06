@@ -13,3 +13,7 @@ vec3 GlobalLight::getDirection() const {
 vec3 GlobalLight::lightDirection(vec3 point) const {
   return -direction;
 }
+
+vec3 GlobalLight::getPosition() const {
+  return -direction * kMaxDistance;
+}

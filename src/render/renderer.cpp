@@ -12,10 +12,13 @@ void Renderer::Render(const Camera& camera,
         RGB color{0, 0, 0};
 
         for (const auto& light : scene.GetLights()) {
-          color = stretchRGB(
-              color,
-              RGB{255, 255, 255} *
-                  dot(hit->normal, light->lightDirection(hit->position)));
+          Ray toLight = Ray(hit->position + light->lightDirection(hit->position) * 1.5f, light->lightDirection(hit->position), 0);
+          if (auto hitShadow = scene.GetHit(toLight, length(hit->position - light->getPosition())); !hitShadow) {
+            color = stretchRGB(
+                color,
+                RGB{255, 255, 255} *
+                    dot(hit->normal, light->lightDirection(hit->position)));
+          }
         }
 
         out_image.SetPixel(imgx, imgy, color);

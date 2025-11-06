@@ -11,3 +11,7 @@ PointLightSource::PointLightSource(vec3 _position,
 vec3 PointLightSource::lightDirection(vec3 point) const {
   return normalize(position - point);
 }
+
+vec3 PointLightSource::getPosition() const {
+  return position;
+}
