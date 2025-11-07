@@ -12,17 +12,14 @@ union RGB {
   };
   uint8_t color[3] = {0};  // Альтернативный доступ к цветам как к массиву
 
-  RGB operator*(const RGB& other) const {
-    return RGB{static_cast<uint8_t>(
-                   (static_cast<int>(r) * static_cast<int>(other.r)) / 255),
-               static_cast<uint8_t>(
-                   (static_cast<int>(g) * static_cast<int>(other.g)) / 255),
-               static_cast<uint8_t>(
-                   (static_cast<int>(b) * static_cast<int>(other.b)) / 255)};
-  }
+  RGB multiplyColors(const RGB& other) const;
 };
 #pragma pack(pop)
 
+// Умножение цветов
+inline RGB multiplyColors(const RGB& a, const RGB& b) {
+  return a.multiplyColors(b);
+}
 RGB stretchRGB(const RGB& col1, const RGB& col2);
 RGB operator*(const RGB& color, float brightness);
 RGB operator*(float brightness, const RGB& color);

@@ -24,10 +24,8 @@ void Renderer::Render(const Camera& camera,
 
           // // Если свет не попадает на поверхность — пропускаем
           if (NdotL > 0.0f) {
-            // Смещение от поверхности (bias) — избегаем self-intersection
-            vec3 shadow_origin = hit.position + hit.normal * 0.1f;
             // Shadow ray: от точки к свету
-            Ray shadow_ray(shadow_origin, L, 0);
+            Ray shadow_ray(hit.position, L, 0);
 
             // Проверка тени: есть ли препятствие между точкой и светом?
             if (auto shadow_hit = scene.GetHit(shadow_ray, hit.obj);
@@ -36,7 +34,7 @@ void Renderer::Render(const Camera& camera,
               RGB contrib = base * NdotL;
 
               // Умножаем на цвет света (RGB * RGB)
-              contrib = contrib * light->getColor();
+              contrib = multiplyColors(contrib, light->getColor());
 
               // Умножаем на яркость (RGB * float)
               contrib = contrib * light->getBrightness();

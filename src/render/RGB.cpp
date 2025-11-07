@@ -1,6 +1,14 @@
 #include "RGB.h"
 #include <algorithm>
-#include <iostream>
+
+RGB RGB::multiplyColors(const RGB& other) const {
+  return RGB{static_cast<uint8_t>(
+                 (static_cast<int>(r) * static_cast<int>(other.r)) / 255),
+             static_cast<uint8_t>(
+                 (static_cast<int>(g) * static_cast<int>(other.g)) / 255),
+             static_cast<uint8_t>(
+                 (static_cast<int>(b) * static_cast<int>(other.b)) / 255)};
+}
 
 RGB stretchRGB(const RGB& col1, const RGB& col2) {
   RGB colRes{0, 0, 0};
