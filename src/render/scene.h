@@ -40,6 +40,7 @@ class Scene {
   const std::vector<std::unique_ptr<LightSource>>& GetLights() const;
 
   std::optional<Hit> GetHit(const Ray& ray) const;
+  std::optional<Hit> GetHit(const Ray& ray, float distance) const;
 
  private:
   std::vector<std::unique_ptr<SceneObject>> objects_;

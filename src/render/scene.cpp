@@ -16,10 +16,10 @@ const std::vector<std::unique_ptr<LightSource>>& Scene::GetLights() const {
   return lights_;
 }
 
-std::optional<Hit> Scene::GetHit(const Ray& ray) const {
+std::optional<Hit> Scene::GetHit(const Ray& ray, float distance) const {
   vec3 position = ray.position;
-
-  for (uint32_t hop = ray.numOfStep; hop < kMaxStep; ++hop) {
+  float traveled = 0.0f;
+  for (uint32_t hop = ray.numOfStep; hop < kMaxStep and traveled < distance; ++hop) {
     const auto [d, obj] = GetDistance(position);
     if (d < kMinDistance) {
       Hit hit;
@@ -30,8 +30,13 @@ std::optional<Hit> Scene::GetHit(const Ray& ray) const {
       return hit;
     }
     position = position + ray.direction * d;
+    traveled += d;
   }
   return std::nullopt;
+}
+
+std::optional<Hit> Scene::GetHit(const Ray& ray) const {
+  return GetHit(ray, kMaxDistance);
 }
 
 std::tuple<float, SceneObject*> Scene::GetDistance(const vec3& position) const {
