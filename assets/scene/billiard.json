@@ -1,5 +1,9 @@
 {
   "camera": { "ref": "camera.json" },
   "lights": { "ref": "light.json" },
-  "objects": { "ref": "objects/sphere.json" }
+  "objects": [
+    { "ref": "objects/sphere.json" },
+    { "ref": "objects/table.json" },
+    { "ref": "objects/borders.json" }
+  ]
 }
