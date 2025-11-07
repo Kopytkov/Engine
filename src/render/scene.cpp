@@ -16,38 +16,46 @@ const std::vector<std::unique_ptr<LightSource>>& Scene::GetLights() const {
   return lights_;
 }
 
-std::optional<Hit> Scene::GetHit(const Ray& ray, float distance) const {
+std::optional<Hit> Scene::GetHit(const Ray& ray,
+                                 float max_distance,
+                                 SceneObject* ignore) const {
   vec3 position = ray.position;
   float traveled = 0.0f;
-  for (uint32_t hop = ray.numOfStep; hop < kMaxStep and traveled < distance; ++hop) {
-    const auto [d, obj] = GetDistance(position);
+  uint32_t step = ray.numOfStep;
+
+  while (step < kMaxStep && traveled < max_distance) {
+    auto [d, obj] = GetDistance(position, ignore);
     if (d < kMinDistance) {
       Hit hit;
       hit.position = position;
       hit.obj = obj;
       hit.normal = obj->getNormal(position);
-
       return hit;
     }
     position = position + ray.direction * d;
     traveled += d;
+    ++step;
   }
   return std::nullopt;
 }
 
-std::optional<Hit> Scene::GetHit(const Ray& ray) const {
-  return GetHit(ray, kMaxDistance);
+std::optional<Hit> Scene::GetHit(const Ray& ray, SceneObject* ignore) const {
+  return GetHit(ray, kMaxDistance, ignore);
 }
 
-std::tuple<float, SceneObject*> Scene::GetDistance(const vec3& position) const {
+std::tuple<float, SceneObject*> Scene::GetDistance(const vec3& position,
+                                                   SceneObject* ignore) const {
   float result = kMaxDistance;
-  SceneObject* nearestObj;
-  for (const auto& object : objects_) {
-    const float d = object->SDF(position);
+  SceneObject* nearest = nullptr;
+  for (const auto& obj : objects_) {
+    if (obj.get() == ignore) {
+      continue;
+    }
+    float d = obj->SDF(position);
     if (d < result) {
       result = d;
-      nearestObj = object.get();
+      nearest = obj.get();
     }
   }
-  return {result, nearestObj};
+  return {result, nearest};
 }

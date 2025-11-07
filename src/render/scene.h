@@ -39,12 +39,17 @@ class Scene {
   const std::vector<std::unique_ptr<SceneObject>>& GetObjects() const;
   const std::vector<std::unique_ptr<LightSource>>& GetLights() const;
 
-  std::optional<Hit> GetHit(const Ray& ray) const;
-  std::optional<Hit> GetHit(const Ray& ray, float distance) const;
+  std::optional<Hit> GetHit(const Ray& ray,
+                            SceneObject* ignore = nullptr) const;
+  std::optional<Hit> GetHit(const Ray& ray,
+                            float distance,
+                            SceneObject* ignore = nullptr) const;
 
  private:
   std::vector<std::unique_ptr<SceneObject>> objects_;
   std::vector<std::unique_ptr<LightSource>> lights_;
 
-  std::tuple<float, SceneObject*> GetDistance(const vec3& position) const;
+  std::tuple<float, SceneObject*> GetDistance(
+      const vec3& position,
+      SceneObject* ignore = nullptr) const;
 };

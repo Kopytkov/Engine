@@ -11,6 +11,15 @@ union RGB {
     uint8_t b;  // Синий канал
   };
   uint8_t color[3] = {0};  // Альтернативный доступ к цветам как к массиву
+
+  RGB operator*(const RGB& other) const {
+    return RGB{static_cast<uint8_t>(
+                   (static_cast<int>(r) * static_cast<int>(other.r)) / 255),
+               static_cast<uint8_t>(
+                   (static_cast<int>(g) * static_cast<int>(other.g)) / 255),
+               static_cast<uint8_t>(
+                   (static_cast<int>(b) * static_cast<int>(other.b)) / 255)};
+  }
 };
 #pragma pack(pop)
 
