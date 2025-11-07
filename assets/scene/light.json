@@ -1,0 +1,14 @@
+[
+    {
+      "type": "point",
+      "position": [0.0, 2.7, 10.0],
+      "color": [1.0, 0.94, 0.78],
+      "brightness": 2.0
+    },
+    {
+      "type": "global",
+      "direction": [0.0, 0.0, 1.0],
+      "color": [1.0, 1.0, 1.0],
+      "brightness": 1.0
+    }
+]

@@ -16,6 +16,8 @@ class Material {
   float transparency = 0;
   float refraction = 0;
 
+  RGB base_color = RGB{255, 255, 255};  // по умолчанию белый
+
  public:
   ~Material();
   Material();
@@ -27,5 +29,5 @@ class Material {
             vec3 direction,
             vec3 norm,
             int numOfStep,
-            bool isOutside);
+            bool isOutside) const;
 };

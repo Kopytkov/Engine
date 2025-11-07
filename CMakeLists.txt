@@ -34,7 +34,13 @@ add_executable(Engine
  src/math/vec_functions.h
  src/render/camera.h
  src/render/camera.cpp
+ src/render/camera_parser.h
+ src/render/camera_parser.cpp
+ src/render/json_utils.h
  src/render/material.h
+ src/render/material.cpp
+ src/render/object_parser.h
+ src/render/object_parser.cpp
  src/render/ray.h
  src/render/ray.cpp
  src/render/raw_image.h
@@ -50,6 +56,8 @@ add_executable(Engine
  src/render/scene_object_sphere.cpp
  src/render/scene.h
  src/render/scene.cpp
+ src/render/light_parser.h
+ src/render/light_parser.cpp
  src/render/light_source.h
  src/render/light_source.cpp
  src/render/light_source_point.h

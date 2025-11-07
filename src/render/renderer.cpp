@@ -8,20 +8,23 @@ void Renderer::Render(const Camera& camera,
     for (uint32_t y = 0; y < out_image.GetHeight(); ++y) {
       auto [imgx, imgy, ray] = camera.GetRay(x, y);
 
-      if (auto hit = scene.GetHit(ray); hit) {
-        RGB color{0, 0, 0};
+      if (auto hit_opt = scene.GetHit(ray); hit_opt) {
+        const Hit& hit = *hit_opt;
+        const Material& mat = hit.obj->GetMaterial();
 
+        // Цвет из материала
+        RGB base = mat.color(scene, hit.position, -ray.direction, hit.normal,
+                             ray.numOfStep, true);
+
+        // Простое освещение
+        RGB final{0, 0, 0};
         for (const auto& light : scene.GetLights()) {
-          Ray toLight = Ray(hit->position + light->lightDirection(hit->position) * 1.5f, light->lightDirection(hit->position), 0);
-          if (auto hitShadow = scene.GetHit(toLight, length(hit->position - light->getPosition())); !hitShadow) {
-            color = stretchRGB(
-                color,
-                RGB{255, 255, 255} *
-                    dot(hit->normal, light->lightDirection(hit->position)));
-          }
+          vec3 L = light->lightDirection(hit.position);
+          float NdotL = std::max(0.0f, dot(hit.normal, L));
+          final = stretchRGB(final, base * NdotL);
         }
 
-        out_image.SetPixel(imgx, imgy, color);
+        out_image.SetPixel(imgx, imgy, final);
       }
     }
   }

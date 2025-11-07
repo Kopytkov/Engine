@@ -1,8 +1,9 @@
 #pragma once
 
+#include <filesystem>
 #include <fstream>
 #include <vector>
-#include <filesystem>
+
 
 #pragma pack(push, 1)
 struct bfi {
@@ -40,7 +41,7 @@ class BMP {
 
   const bmpInfo& getInfo() const;
 
-  void Write(std::filesystem::path& out) const;
+  void Write(const std::filesystem::path& out) const;
 
  private:
   bmpInfo info_;

@@ -19,7 +19,10 @@ class Texture {
   // Возвращает ID текстуры для использования в рендеринге
   GLuint getTextureID() const { return textureID_; }
 
+  RawImage& getImage() { return image_; }              // для модификации
+  const RawImage& getImage() const { return image_; }  // для чтения
+
  private:
-  const RawImage& image_;  // Ссылка на RawImage для доступа к данным
-  GLuint textureID_;       // ID OpenGL-текстуры
+  RawImage image_;    // Копия RawImage
+  GLuint textureID_;  // ID OpenGL-текстуры
 };
