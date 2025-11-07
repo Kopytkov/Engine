@@ -8,4 +8,5 @@ class PointLightSource : public LightSource {
 
   vec3 getPosition();
   vec3 lightDirection(vec3 point) const override;
+  vec3 getPosition() const override;
 };

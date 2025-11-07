@@ -8,4 +8,5 @@ class GlobalLight : public LightSource {
 
   vec3 getDirection() const;
   vec3 lightDirection(vec3 point) const override;
+  vec3 getPosition() const override;
 };

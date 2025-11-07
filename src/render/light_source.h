@@ -14,6 +14,7 @@ class LightSource {
   RGB getColor() const;
 
   virtual vec3 lightDirection(vec3 point) const = 0;
+  virtual vec3 getPosition() const = 0;
 };
 
 using LightSources = std::vector<std::unique_ptr<LightSource>>;
