@@ -11,9 +11,15 @@ union RGB {
     uint8_t b;  // Синий канал
   };
   uint8_t color[3] = {0};  // Альтернативный доступ к цветам как к массиву
+
+  RGB multiplyColors(const RGB& other) const;
 };
 #pragma pack(pop)
 
+// Умножение цветов
+inline RGB multiplyColors(const RGB& a, const RGB& b) {
+  return a.multiplyColors(b);
+}
 RGB stretchRGB(const RGB& col1, const RGB& col2);
 RGB operator*(const RGB& color, float brightness);
 RGB operator*(float brightness, const RGB& color);

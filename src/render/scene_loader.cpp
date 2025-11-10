@@ -70,8 +70,44 @@ SceneLoader SceneLoader::Load(const std::string& jsonPath) {
     }
   }
   if (resolved.contains("objects")) {
-    for (const auto& o : resolved["objects"]) {
-      scene.AddObject(ObjectParser::Parse(o));
+    const auto& objectsNode = resolved["objects"];
+
+    // Если objects — это массив с ref
+    if (objectsNode.is_array()) {
+      for (const auto& item : objectsNode) {
+        json resolvedItem;
+        if (item.is_object() && item.contains("ref")) {
+          resolvedItem = resolveRef(item, baseDir);
+        } else {
+          resolvedItem = item;
+        }
+
+        // Теперь resolvedItem — либо массив объектов, либо один объект
+        if (resolvedItem.is_array()) {
+          for (const auto& obj : resolvedItem) {
+            scene.AddObject(ObjectParser::Parse(obj));
+          }
+        } else {
+          scene.AddObject(ObjectParser::Parse(resolvedItem));
+        }
+      }
+    }
+    // Если objects — один ref
+    else if (objectsNode.is_object() && objectsNode.contains("ref")) {
+      json included = resolveRef(objectsNode, baseDir);
+      if (included.is_array()) {
+        for (const auto& obj : included) {
+          scene.AddObject(ObjectParser::Parse(obj));
+        }
+      } else {
+        scene.AddObject(ObjectParser::Parse(included));
+      }
+    }
+    // Если objects — массив объектов
+    else if (objectsNode.is_array()) {
+      for (const auto& obj : objectsNode) {
+        scene.AddObject(ObjectParser::Parse(obj));
+      }
     }
   }
 

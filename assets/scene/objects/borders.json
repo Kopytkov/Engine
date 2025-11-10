@@ -1,0 +1,26 @@
+[
+  {
+    "type": "box",
+    "position": [-9, 2.7, 0.5],
+    "vertex": [0.15, 6, 1.5],
+    "material": { "color": [0.4, 0.2, 0.1] }
+  },
+  {
+    "type": "box",
+    "position": [9, 2.7, 0.5],
+    "vertex": [0.15, 6, 1.5],
+    "material": { "color": [0.4, 0.2, 0.1] }
+  },
+  {
+    "type": "box",
+    "position": [0, -3.3, 0.5],
+    "vertex": [9, 0.15, 1.5],
+    "material": { "color": [0.4, 0.2, 0.1] }
+  },
+  {
+    "type": "box",
+    "position": [0, 8.7, 0.5],
+    "vertex": [9, 0.15, 1.5],
+    "material": { "color": [0.4, 0.2, 0.1] }
+  }
+]

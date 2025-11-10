@@ -39,6 +39,12 @@ class vec {
     }
   }
 
+  vec(const std::array<T, N>& arr) {
+    for (int i = 0; i < N; ++i) {
+      data[i] = arr[i];
+    }
+  }
+
   template <typename... Args>
   vec(Args... args) noexcept : data{static_cast<T>(args)...} {}
 
