@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 #include "material.h"
@@ -36,6 +37,14 @@ inline Material parseMaterial(const json& j) {
   }
   if (j.contains("refraction")) {
     mat.refraction = j["refraction"].get<float>();
+  }
+  if (j.contains("roughness")) {
+    mat.roughness = j["roughness"].get<float>();
+  }
+  if (j.contains("metallic")) {
+    mat.metallic = j["metallic"].get<float>();
+  } else {
+    mat.metallic = 0.0f;  // default для шаров — диэлектрик
   }
 
   return mat;
