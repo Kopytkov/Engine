@@ -11,10 +11,17 @@ Material::~Material() = default;
 
 Material::Material(Texture& tex) : texture(tex), base_color{255, 255, 255} {}
 
-Material::Material(float refl, float tr, float refract, Texture& tex)
+Material::Material(float refl,
+                   float tr,
+                   float refract,
+                   float rough,
+                   float metal,
+                   Texture& tex)
     : reflectivity(refl),
       transparency(tr),
       refraction(refract),
+      roughness(rough),
+      metallic(metal),
       texture(tex),
       base_color{255, 255, 255} {}
 
