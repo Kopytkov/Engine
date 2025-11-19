@@ -12,6 +12,6 @@ vec3 Sphere::getNormal(const vec3& point) const {
   return normalize(point - position_);
 }
 
-const Material* Sphere::GetMaterial() const {
-  return material_.get();
+const Material& Sphere::GetMaterial() const {
+  return *material_.get();
 }

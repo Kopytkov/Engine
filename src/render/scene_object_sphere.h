@@ -5,7 +5,7 @@ class Sphere : public SceneObject {
   Sphere(const vec3& position, float r, std::unique_ptr<Material> mat);
   float SDF(const vec3& point) const override;
   vec3 getNormal(const vec3& point) const override;
-  const Material* GetMaterial() const override;
+  const Material& GetMaterial() const override;
 
  private:
   vec3 position_;

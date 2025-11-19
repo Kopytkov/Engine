@@ -22,6 +22,6 @@ vec3 Box::getNormal(const vec3& point) const {
   return res;
 }
 
-const Material* Box::GetMaterial() const {
-  return material_.get();
+const Material& Box::GetMaterial() const {
+  return *material_.get();
 }

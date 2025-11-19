@@ -6,7 +6,7 @@ class Box : public SceneObject {
   Box(const vec3& position, const vec3& vertex, std::unique_ptr<Material> mat);
   float SDF(const vec3& point) const override;
   vec3 getNormal(const vec3& point) const override;
-  const Material* GetMaterial() const override;
+  const Material& GetMaterial() const override;
 
  private:
   vec3 position_;

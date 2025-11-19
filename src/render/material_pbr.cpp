@@ -97,7 +97,8 @@ vec3 MaterialPBR::shade(const Hit& hit,
     auto shadow_hit = scene.GetHit(shadow_ray, kMaxDistance, hit.obj);
 
     if (shadow_hit) {
-      if (!shadow_hit->obj->GetMaterial()->isTransparent()) {
+      const Material& shadow_mat = shadow_hit->obj->GetMaterial();
+      if (!shadow_mat.isTransparent()) {
         continue;
       }
     }
@@ -121,7 +122,7 @@ vec3 MaterialPBR::shade(const Hit& hit,
     directLighting += (kD * baseColor / M_PI + specular) * radiance * NdotL;
   }
 
-  // GI: отражение И преломление
+  // GI: отражение и преломление
 
   vec3 reflectionColor(0.0f);
   // Отражение (Reflection)

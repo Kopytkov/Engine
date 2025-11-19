@@ -23,10 +23,10 @@ vec3 Scene::CastRay(const Ray& ray, int depth) const {
 
   if (auto hit_opt = GetHit(ray); hit_opt) {
     const Hit& hit = *hit_opt;
-    const Material* mat = hit.obj->GetMaterial();
+    const Material& mat = hit.obj->GetMaterial();
 
     vec3 V = normalize(-ray.direction);
-    return mat->shade(hit, *this, V, depth);
+    return mat.shade(hit, *this, V, depth);
   }
 
   // Если луч улетел в пустоту, рисуем градиент

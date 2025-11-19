@@ -139,12 +139,13 @@ vec<T, N> reflect(const vec<T, N>& i, const vec<T, N>& n) {
 
 template <typename T, int N>
 vec<T, N> refract(const vec<T, N>& i, const vec<T, N>& n, float r) {
-  float d = 1.0f - r * r * (1.0f - dot(n, i) * dot(n, i));
+  const auto dot_p = dot(n, i);
+  float d = 1.0f - r * r * (1.0f - dot_p * dot_p);
 
   if (d < 0.0f) {
     return vec<T, N>(0.0f);
   } else {
-    return r * i - (r * dot(n, i) + std::sqrt(d)) * n;
+    return r * i - (r * dot_p + std::sqrt(d)) * n;
   }
 }
 
