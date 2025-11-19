@@ -16,6 +16,29 @@ const std::vector<std::unique_ptr<LightSource>>& Scene::GetLights() const {
   return lights_;
 }
 
+vec3 Scene::CastRay(const Ray& ray, int depth) const {
+  if (depth > 5) {
+    return vec3(0.0f);  // Если лучи запутались, возвращаем черный
+  }
+
+  if (auto hit_opt = GetHit(ray); hit_opt) {
+    const Hit& hit = *hit_opt;
+    const Material* mat = hit.obj->GetMaterial();
+
+    vec3 V = normalize(-ray.direction);
+    return mat->shade(hit, *this, V, depth);
+  }
+
+  // Если луч улетел в пустоту, рисуем градиент
+  vec3 unit_direction = normalize(ray.direction);
+
+  // t меняется от 0 до 1
+  float t = 0.5f * (unit_direction[1] + 1.0f);
+
+  // Линейная интерполяция от белого к голубому
+  return mix(vec3(1.0f, 1.0f, 1.0f), vec3(0.5f, 0.7f, 1.0f), t);
+}
+
 std::optional<Hit> Scene::GetHit(const Ray& ray,
                                  float max_distance,
                                  SceneObject* ignore) const {
@@ -51,7 +74,7 @@ std::tuple<float, SceneObject*> Scene::GetDistance(const vec3& position,
     if (obj.get() == ignore) {
       continue;
     }
-    float d = obj->SDF(position);
+    float d = std::abs(obj->SDF(position));
     if (d < result) {
       result = d;
       nearest = obj.get();

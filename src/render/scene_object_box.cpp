@@ -1,8 +1,10 @@
 #include "scene_object_box.h"
 #include "math/vec_functions.h"
 
-Box::Box(const vec3& position, const vec3& vertex, const Material& mat)
-    : position_(position), vertex_(abs(vertex)), material_(mat) {}
+Box::Box(const vec3& position,
+         const vec3& vertex,
+         std::unique_ptr<Material> mat)
+    : position_(position), vertex_(abs(vertex)), material_(std::move(mat)) {}
 
 float Box::SDF(const vec3& point) const {
   vec3 q = abs(point - position_) - vertex_;
@@ -20,6 +22,6 @@ vec3 Box::getNormal(const vec3& point) const {
   return res;
 }
 
-const Material& Box::GetMaterial() const {
-  return material_;
+const Material* Box::GetMaterial() const {
+  return material_.get();
 }

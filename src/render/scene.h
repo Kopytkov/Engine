@@ -4,8 +4,10 @@
 #include <optional>
 #include <vector>
 
+#include <cmath>
 #include "light_source.h"
 #include "math/vec.h"
+#include "math/vec_functions.h"
 #include "ray.h"
 #include "scene_object.h"
 
@@ -38,6 +40,7 @@ class Scene {
   void AddLight(std::unique_ptr<LightSource> light);
   const std::vector<std::unique_ptr<SceneObject>>& GetObjects() const;
   const std::vector<std::unique_ptr<LightSource>>& GetLights() const;
+  vec3 CastRay(const Ray& ray, int depth) const;
 
   std::optional<Hit> GetHit(const Ray& ray,
                             SceneObject* ignore = nullptr) const;
