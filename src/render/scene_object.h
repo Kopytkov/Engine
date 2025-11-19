@@ -1,5 +1,5 @@
 #pragma once
-
+#include <memory>
 #include "material.h"
 #include "math/vec.h"
 

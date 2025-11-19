@@ -158,6 +158,14 @@ vec<T, N>& operator-=(vec<T, N>& v1, const vec<T, N>& v2) {
 }
 
 template <typename T, int N>
+vec<T, N>& operator*=(vec<T, N>& v, T a) {
+  for (int i = 0; i < N; i++) {
+    v[i] *= a;
+  }
+  return v;
+}
+
+template <typename T, int N>
 std::ostream& operator<<(std::ostream& os, const vec<T, N>& v) {
   std::ostream& res = os << "(" << v[0];
   for (int i = 1; i < N; i++) {

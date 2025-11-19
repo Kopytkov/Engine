@@ -1,36 +1,23 @@
 #pragma once
-#include <iostream>
-#include "bmp/bmp.h"
+#include "RGB.h"
 #include "math/vec.h"
-#include "texture.h"
+
 class Scene;
+struct Hit;
 
 class Material {
-  Texture texture;
-
  public:
-  float reflectivity = 0;
-  float transparency = 0;
-  float refraction = 0;
-  float roughness = 0.0f;               // шераховатость
-  float metallic = 0.0f;                // металличность
-  RGB base_color = RGB{255, 255, 255};  // по умолчанию белый
+  virtual ~Material() = default;
 
- public:
-  ~Material();
-  Material();
-  Material(Texture& tex);
-  Material(float refl,
-           float tr,
-           float refract,
-           float rough,
-           float metal,
-           Texture& tex);
+  // Возвращает базовый цвет в точке
+  virtual RGB albedo(const Hit& hit, const Scene& scene) const = 0;
 
-  RGB color(const Scene& scene,
-            vec3 position,
-            vec3 direction,
-            vec3 norm,
-            int numOfStep,
-            bool isOutside) const;
+  // Расчёт цвета (математика света)
+  virtual vec3 shade(const Hit& hit,
+                     const Scene& scene,
+                     const vec3& viewDir,
+                     int depth = 0) const = 0;
+
+  // Пропускает ли материал свет
+  virtual bool isTransparent() const { return false; }
 };
