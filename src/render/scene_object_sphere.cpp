@@ -2,14 +2,16 @@
 #include "math/vec_functions.h"
 
 Sphere::Sphere(const vec3& position, float r, const Material& mat)
-    : position_(position), radius_(r), material_(mat) {}
+    : radius_(r), material_(mat) {
+      SetPosition(position);
+    }
 
 float Sphere::SDF(const vec3& point) const {
-  return length(point - position_) - radius_;
+  return length(point - GetPosition()) - radius_;
 }
 
 vec3 Sphere::getNormal(const vec3& point) const {
-  return normalize(point - position_);
+  return normalize(point - GetPosition());
 }
 
 const Material& Sphere::GetMaterial() const {

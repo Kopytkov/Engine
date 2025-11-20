@@ -70,6 +70,10 @@ add_executable(Engine
  src/render/RGB.cpp
  src/render/scene_object_box.h
  src/render/scene_object_box.cpp
+ src/render/property.h
+ src/render/property.cpp
+ src/render/controller.h
+ src/render/controller.cpp
  )
 target_link_libraries(Engine 
     PRIVATE 
