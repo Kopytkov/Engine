@@ -124,6 +124,24 @@ vec<T, N> operator/(const vec<T, N>& v, const T& a) {
 }
 
 template <typename T, int N>
+vec<T, N> operator/(const vec<T, N>& v1, const vec<T, N>& v2) {
+  vec<T, N> res;
+  for (int i = 0; i < N; i++) {
+    res[i] = v1[i] / v2[i];
+  }
+  return res;
+}
+
+template <typename T, int N>
+vec<T, N> operator/(const T& a, const vec<T, N>& v) {
+  vec<T, N> res;
+  for (int i = 0; i < N; i++) {
+    res[i] = a / v[i];
+  }
+  return res;
+}
+
+template <typename T, int N>
 vec<T, N>& operator+=(vec<T, N>& v1, const vec<T, N>& v2) {
   for (int i = 0; i < N; i++) {
     v1[i] += v2[i];
@@ -137,6 +155,14 @@ vec<T, N>& operator-=(vec<T, N>& v1, const vec<T, N>& v2) {
     v1[i] -= v2[i];
   }
   return v1;
+}
+
+template <typename T, int N>
+vec<T, N>& operator*=(vec<T, N>& v, T a) {
+  for (int i = 0; i < N; i++) {
+    v[i] *= a;
+  }
+  return v;
 }
 
 template <typename T, int N>

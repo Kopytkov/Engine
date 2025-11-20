@@ -2,7 +2,10 @@
 
 #include <memory>
 #include <nlohmann/json.hpp>
-#include "scene_object.h"
+#include "json_utils.h"
+#include "material_pbr.h"
+#include "scene_object_box.h"
+#include "scene_object_sphere.h"
 
 class ObjectParser {
  public:

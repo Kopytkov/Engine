@@ -1,16 +1,15 @@
 #pragma once
-#include "material.h"
 #include "scene_object.h"
 #include "property.h"
 
 class Box : public SceneObject, public PositionProperty {
  public:
-  Box(const vec3& position, const vec3& vertex, const Material& mat);
+  Box(const vec3& position, const vec3& vertex, std::unique_ptr<Material> mat);
   float SDF(const vec3& point) const override;
   vec3 getNormal(const vec3& point) const override;
   const Material& GetMaterial() const override;
 
  private:
   vec3 vertex_;
-  Material material_;
+  std::unique_ptr<Material> material_;
 };

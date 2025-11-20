@@ -1,8 +1,13 @@
 #pragma once
 
+#include <algorithm>
+#include <cmath>
+#include "render/RGB.h"
 #include "vec.h"
 
-#include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846f
+#endif
 
 template <typename T, int N>
 vec<T, N> min(const vec<T, N>& a, const vec<T, N>& b) {
@@ -84,10 +89,10 @@ inline vec3 cross(const vec3& a, const vec3& b) {
 }
 
 template <typename T, int N>
-float dot(const vec<T, N>& a, const vec<T, N>& b) {
-  float res = 0;
+T dot(const vec<T, N>& a, const vec<T, N>& b) {
+  T res = T(0);
   for (int i = 0; i < N; i++) {
-    res += float(a[i] * b[i]);
+    res += a[i] * b[i];
   }
   return res;
 }
@@ -134,10 +139,68 @@ vec<T, N> reflect(const vec<T, N>& i, const vec<T, N>& n) {
 
 template <typename T, int N>
 vec<T, N> refract(const vec<T, N>& i, const vec<T, N>& n, float r) {
-  float d = 1.0 - r * r * (1.0 - dot(n, i) * dot(n, i));
-  if (d < 0.0) {
-    return vec<T, N>(0.0);
+  const auto dot_p = dot(n, i);
+  float d = 1.0f - r * r * (1.0f - dot_p * dot_p);
+
+  if (d < 0.0f) {
+    return vec<T, N>(0.0f);
   } else {
-    return r * i - (r * dot(n, i) + sqrt(d)) * n;
+    return r * i - (r * dot_p + std::sqrt(d)) * n;
   }
+}
+
+template <typename T, int N>
+vec<T, N> pow(const vec<T, N>& v, T exponent) {
+  vec<T, N> res;
+  for (int i = 0; i < N; ++i) {
+    res[i] = std::pow(v[i], exponent);
+  }
+  return res;
+}
+
+template <typename T, int N>
+vec<T, N> pow(const vec<T, N>& v1, const vec<T, N>& v2) {
+  vec<T, N> res;
+  for (int i = 0; i < N; ++i) {
+    res[i] = std::pow(v1[i], v2[i]);
+  }
+  return res;
+}
+
+inline float saturate(float x) {
+  return std::max(0.0f, std::min(1.0f, x));
+}
+
+inline vec3 RGBtoVec3(const RGB& c) {
+  return vec3(static_cast<float>(c.r) / 255.0f,
+              static_cast<float>(c.g) / 255.0f,
+              static_cast<float>(c.b) / 255.0f);
+}
+
+inline RGB Vec3toRGB(const vec3& c) {
+  auto clamp255 = [](float v) -> uint8_t {
+    return static_cast<uint8_t>(std::clamp(v * 255.0f, 0.0f, 255.0f));
+  };
+  return RGB{clamp255(c[0]), clamp255(c[1]), clamp255(c[2])};
+}
+
+// Постобработка: Гамма-коррекция (sRGB)
+inline vec3 applyGamma(vec3 color, float gamma = 2.2f) {
+  return pow(color, 1.0f / gamma);
+}
+
+// Тонмаппинг: Reinhard
+inline vec3 reinhardTonemap(vec3 color) {
+  return color / (color + vec3(1.0f));
+}
+
+// Тонмаппинг: ACES
+inline vec3 acesTonemap(vec3 color) {
+  const float a = 2.51f;
+  const float b = 0.03f;
+  const float c = 2.43f;
+  const float d = 0.59f;
+  const float e = 0.14f;
+  return clamp((color * (a * color + b)) / (color * (c * color + d) + e), 0.0f,
+               1.0f);
 }
