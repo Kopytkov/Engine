@@ -1,5 +1,5 @@
 #include "scene_object.h"
-#include "property.h"
+#include "control/property.h"
 
 class Sphere : public SceneObject, public PositionProperty {
  public:

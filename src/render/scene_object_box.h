@@ -1,6 +1,6 @@
 #pragma once
 #include "scene_object.h"
-#include "property.h"
+#include "control/property.h"
 
 class Box : public SceneObject, public PositionProperty {
  public:
