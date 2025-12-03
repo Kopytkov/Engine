@@ -1,5 +1,9 @@
 #include <SDL2/SDL.h>
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
+
 #include "bmp/bmp.h"
 #include "gl/gl_renderer.h"
 #include "gl/shader.h"
@@ -7,6 +11,8 @@
 #include "render/renderer.h"
 #include "render/scene_loader.h"
 #include "render/texture.h"
+
+using json = nlohmann::json;
 
 int main(int argc, char* argv[]) {
   // Инициализация SDL
@@ -40,6 +46,74 @@ int main(int argc, char* argv[]) {
 
   // Загрузка шейдеров
   Shader shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
+
+  // Проверка и генерация текстур через манифест
+  const std::string textures_dir = "assets/textures";
+  const std::string sphere_json_path = "assets/scene/objects/sphere.json";
+  const std::string manifest_path = "assets/textures/textures_manifest.json";
+  const std::string python_script_cmd =
+      "python assets/textures/script_for_textures.py";
+
+  bool need_generate = false;
+
+  try {
+    // Получаем список всех ожидаемых имён объектов из sphere.json
+    std::ifstream sphere_file(sphere_json_path);
+    if (!sphere_file.is_open()) {
+      throw std::runtime_error("Cannot open sphere.json");
+    }
+    json sphere_data = json::parse(sphere_file);
+
+    std::vector<std::string> expected_names;
+    for (const auto& item : sphere_data) {
+      if (item.contains("name") && item["name"].is_string()) {
+        expected_names.emplace_back(item["name"].get<std::string>());
+      }
+    }
+
+    // Загружаем манифест (если есть)
+    json manifest = json::object();  // пустой объект по умолчанию
+    if (std::filesystem::exists(manifest_path)) {
+      std::ifstream mf(manifest_path);
+      if (mf) {
+        mf >> manifest;  // nlohmann сам кидает исключение
+      }
+    } else {
+      need_generate = true;  // манифеста нет — точно нужно генерировать
+    }
+
+    // Проверяем каждую текстуру
+    if (!need_generate) {
+      for (const auto& name : expected_names) {
+        if (!manifest.contains(name)) {
+          need_generate = true;
+          break;
+        }
+
+        std::string rel_path = manifest[name];
+        std::filesystem::path full_path =
+            std::filesystem::path(textures_dir) / rel_path;
+
+        if (!std::filesystem::exists(full_path)) {
+          need_generate = true;
+          break;
+        }
+      }
+    }
+
+    // --- Если чего-то не хватает — запускаем Python-скрипт ---
+    if (need_generate) {
+      int result = std::system(python_script_cmd.c_str());
+      if (result != 0) {
+        std::cerr << "[Textures] Python script failed (code " << result
+                  << "). Continuing anyway.\n";
+        return -1;
+      }
+    }
+
+  } catch (const std::exception& e) {
+    std::cerr << "[Textures] Error during texture check: " << e.what() << "\n";
+  }
 
   // === ЗАГРУЗКА СЦЕНЫ ИЗ JSON ===
   try {

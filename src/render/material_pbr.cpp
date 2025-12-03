@@ -4,12 +4,14 @@ MaterialPBR::MaterialPBR(const RGB& color,
                          float rough,
                          float metal,
                          float trans,
-                         float refrac)
+                         float refrac,
+                         std::shared_ptr<RawImage> albedoImage)
     : base_color_(color),
       roughness_(std::clamp(rough, 0.03f, 1.0f)),
       metallic_(std::clamp(metal, 0.0f, 1.0f)),
       transmission_(std::clamp(trans, 0.0f, 1.0f)),
-      refraction_(std::max(refrac, 1.0f)) {}
+      refraction_(std::max(refrac, 1.0f)),
+      albedo_image_(albedoImage) {}
 
 // D_GGX — нормализованное распределение микрофасетов (Normal Distribution
 // Function). Контролирует «плотность» ориентированных граней, направленных к
@@ -35,8 +37,37 @@ vec3 MaterialPBR::FresnelSchlick(float cosTheta, const vec3& F0) {
   return F0 + (vec3(1.0f, 1.0f, 1.0f) - F0) * pow(1.0f - cosTheta, 5.0f);
 }
 
-RGB MaterialPBR::albedo(const Hit& hit, const Scene& scene) const {
-  return base_color_;
+RGB MaterialPBR::albedo(const Hit& hit, const Scene&) const {
+  if (!albedo_image_) {
+    return base_color_;
+  }
+
+  vec3 n = normalize(hit.normal);
+
+  // Вычисление UV-координат на основе нормали сферы
+  float u = 0.75f - std::atan2(n[2], n[0]) / (2.0f * M_PI);
+  float v = 0.5f + std::asin(n[1]) / M_PI;
+
+  u = u - std::floor(u);
+  v = std::clamp(v, 0.0f, 1.0f);
+
+  // Масштабирование вокруг центра для уменьшения размера текстуры
+  const float center_u = 0.5f;
+  const float center_v = 0.5f;
+  const float scale = 3.0f;  // для сжатия
+  float u_scaled = center_u + (u - center_u) * scale;
+  float v_scaled = center_v + (v - center_v) * scale;
+
+  u_scaled = std::clamp(u_scaled, 0.0f, 1.0f);
+  v_scaled = std::clamp(v_scaled, 0.0f, 1.0f);
+
+  int x = std::min(int(u_scaled * albedo_image_->GetWidth()),
+                   int(albedo_image_->GetWidth() - 1));
+
+  int y = std::min(int(v_scaled * albedo_image_->GetHeight()),
+                   int(albedo_image_->GetHeight() - 1));
+
+  return albedo_image_->GetPixel(x, y);
 }
 
 vec3 MaterialPBR::shade(const Hit& hit,

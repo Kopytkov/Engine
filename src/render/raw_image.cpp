@@ -42,3 +42,19 @@ void RawImage::SetPixel(uint32_t x, uint32_t y, const RGB& color) {
   raw_data_[sizeof(RGB) * x + line_bytes * y + 1] = color.g;
   raw_data_[sizeof(RGB) * x + line_bytes * y + 2] = color.r;
 }
+
+RGB RawImage::GetPixel(uint32_t x, uint32_t y) const {
+  // Защищаемся от выхода за границы
+  if (x >= width_ || y >= height_) {
+    return RGB{0, 0, 0};
+  }
+
+  const uint32_t line_bytes = ((width_ * 24 + 31) / 32) * 4;
+  uint32_t idx = sizeof(RGB) * x + line_bytes * y;
+
+  uint8_t b = raw_data_[idx + 0];
+  uint8_t g = raw_data_[idx + 1];
+  uint8_t r = raw_data_[idx + 2];
+
+  return RGB{r, g, b};
+}
