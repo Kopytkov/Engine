@@ -2,8 +2,8 @@
 
 #include <string>
 #include <vector>
-#include "../bmp/bmp.h"
 #include "RGB.h"
+#include "bmp/bmp.h"
 
 // Загружает данные изображения из BMP-файла, используя структуры из bmp.h
 RawImage loadFromBMP(const std::string& filename);
@@ -23,6 +23,9 @@ class RawImage {
 
   // Возвращает указатель на сырые данные изображения
   const uint8_t* raw_data() const { return raw_data_.data(); }
+
+  // Возвращает цвет пикселя по координатам (x, y)
+  RGB GetPixel(uint32_t x, uint32_t y) const;
 
  private:
   uint32_t width_;                 // Ширина изображения

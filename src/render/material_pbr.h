@@ -13,6 +13,7 @@ class MaterialPBR : public Material {
   float metallic_;      // металличность
   float transmission_;  // светопропускание
   float refraction_;    // преломление
+  std::shared_ptr<RawImage> albedo_image_;
 
   static float D_GGX(float NdotH, float alpha);
   static float G_SchlickGGX(float NdotX, float k);
@@ -24,7 +25,8 @@ class MaterialPBR : public Material {
               float rough = 0.18f,
               float metal = 0.0f,
               float trans = 0.0f,
-              float refrac = 1.5f);
+              float refrac = 1.5f,
+              std::shared_ptr<RawImage> albedoImage = nullptr);
 
   RGB albedo(const Hit& hit, const Scene& scene) const override;
 
