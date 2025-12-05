@@ -70,6 +70,8 @@ add_executable(Engine
  src/render/light_source_global.cpp
  src/render/texture.h
  src/render/texture.cpp
+ src/render/texture_manager.h
+ src/render/texture_manager.cpp
  src/render/RGB.h
  src/render/RGB.cpp
  src/render/scene_object_box.h

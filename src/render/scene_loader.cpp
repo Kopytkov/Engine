@@ -1,8 +1,5 @@
 #include "scene_loader.h"
 #include <fstream>
-#include "camera_parser.h"
-#include "light_parser.h"
-#include "object_parser.h"
 
 using json = nlohmann::json;
 

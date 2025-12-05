@@ -2,7 +2,9 @@
 
 #include <optional>
 #include <string>
-#include "camera.h"
+#include "camera_parser.h"
+#include "light_parser.h"
+#include "object_parser.h"
 #include "scene.h"
 
 class SceneLoader {
