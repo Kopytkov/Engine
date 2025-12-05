@@ -1,7 +1,5 @@
 #include "camera_parser.h"
 #include <array>
-#include "json_utils.h"
-#include "math/vec_functions.h"
 
 using json = nlohmann::json;
 
