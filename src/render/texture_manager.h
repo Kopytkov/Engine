@@ -9,7 +9,8 @@ class TextureManager {
  public:
   static TextureManager& GetInstance();
   void Initialize();
-  std::string GetTexturePath(const std::string& name) const;
+  const std::string& GetTexturePath(const std::string& name) const;
+  void Shutdown();
 
  private:
   TextureManager() = default;

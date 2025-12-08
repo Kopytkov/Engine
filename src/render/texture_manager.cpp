@@ -33,12 +33,17 @@ void TextureManager::Initialize() {
   LoadManifest();
 }
 
-std::string TextureManager::GetTexturePath(const std::string& name) const {
+const std::string& TextureManager::GetTexturePath(
+    const std::string& name) const {
   auto it = texture_paths_.find(name);
   if (it != texture_paths_.end()) {
-    return textures_dir_ + "/" + it->second;
+    return it->second;
   }
   throw std::runtime_error("Texture not found for name: " + name);
+}
+
+void TextureManager::Shutdown() {
+  texture_paths_.clear();
 }
 
 void TextureManager::LoadManifest() {
@@ -58,7 +63,8 @@ void TextureManager::LoadManifest() {
 
   for (const auto& [key, value] : manifest.items()) {
     if (value.is_string()) {
-      texture_paths_[key] = value.get<std::string>();
+      // Сохраняем полный путь
+      texture_paths_[key] = textures_dir_ + "/" + value.get<std::string>();
     }
   }
 }

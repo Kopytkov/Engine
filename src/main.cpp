@@ -96,8 +96,10 @@ int main(int argc, char* argv[]) {
       // Обмен буферов: вывод кадра на экран
       SDL_GL_SwapWindow(window);
     }
+    TextureManager::GetInstance().Shutdown();
   } catch (const std::exception& e) {
     std::cerr << "ERROR: " << e.what() << std::endl;
+    TextureManager::GetInstance().Shutdown();
     SDL_DestroyWindow(window);
     SDL_Quit();
     return -1;

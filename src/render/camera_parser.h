@@ -3,8 +3,6 @@
 #include <nlohmann/json.hpp>
 #include <optional>
 #include "camera.h"
-#include "json_utils.h"
-#include "math/vec_functions.h"
 
 class CameraParser {
  public:
