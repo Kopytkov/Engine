@@ -1,4 +1,6 @@
 #include <SDL2/SDL.h>
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -10,6 +12,8 @@
 #include "render/scene_loader.h"
 #include "render/texture.h"
 #include "render/texture_manager.h"
+
+using json = nlohmann::json;
 
 using json = nlohmann::json;
 
