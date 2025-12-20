@@ -1,25 +1,26 @@
 #pragma once
 #include <glad/glad.h>
 #include <string>
+#include "math/vec.h"
 
 class Shader {
  public:
   Shader(const std::string& vertexPath, const std::string& fragmentPath);
   ~Shader();
 
-  // Активирует шейдерную программу для рендеринга
   void use() const;
 
-  // Устанавливает целочисленное значение для uniform-переменной в шейдере
   void setInt(const std::string& name, int value) const;
+  void setFloat(const std::string& name, float value) const;
+  void setVec2(const std::string& name, float x, float y) const;
+  void setVec3(const std::string& name, float x, float y, float z) const;
+  void setVec3(const std::string& name, const vec3& value) const;
+
   GLuint getID() const { return programID; }
 
  private:
   GLuint programID;
 
-  // Вспомогательные функции для чтения файлов и компиляции шейдеров
   std::string readFile(const std::string& path);
-
-  // Компилирует шейдер указанного типа (вершинный или фрагментный)
   GLuint compileShader(const std::string& source, GLenum type);
 };

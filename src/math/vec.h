@@ -176,3 +176,4 @@ std::ostream& operator<<(std::ostream& os, const vec<T, N>& v) {
 }
 
 using vec3 = vec<float, 3>;
+using vec2 = vec<float, 3>;
