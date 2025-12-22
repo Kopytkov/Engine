@@ -32,6 +32,8 @@ add_executable(Engine
  src/gl/gl_renderer.cpp
  src/math/vec.h
  src/math/vec_functions.h
+ src/render/app_utils.h
+ src/render/app_utils.cpp
  src/render/camera.h
  src/render/camera.cpp
  src/render/camera_parser.h

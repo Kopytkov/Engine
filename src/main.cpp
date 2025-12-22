@@ -1,21 +1,14 @@
 #include <SDL2/SDL.h>
-#include <cstdlib>
-#include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 
-#include "bmp/bmp.h"
 #include "gl/gl_renderer.h"
 #include "gl/shader.h"
+#include "render/app_utils.h"
+#include "render/camera.h"
 #include "render/raw_image.h"
-#include "render/renderer.h"
 #include "render/scene_loader.h"
 #include "render/texture.h"
 #include "render/texture_manager.h"
-
-using json = nlohmann::json;
-
-using json = nlohmann::json;
 
 int main(int argc, char* argv[]) {
   // Инициализация SDL
@@ -47,70 +40,121 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  // Загрузка шейдеров
-  Shader shader("assets/shaders/vertex.glsl", "assets/shaders/fragment.glsl");
-
-  // Проверка и генерация текстур
-  try {
-    TextureManager::GetInstance().Initialize();
-  } catch (const std::exception& e) {
-    std::cerr << "[Textures] Error during initialization: " << e.what() << "\n";
+  // Загрузка шейдеров для raymarching-рендеринга
+  Shader raymarchShader("assets/shaders/vertex.glsl",
+                        "assets/shaders/raymarch_fragment.glsl");
+  if (raymarchShader.getID() == 0) {
+    std::cerr << "Failed to compile/link raymarch shader" << std::endl;
     SDL_DestroyWindow(window);
     SDL_Quit();
     return -1;
   }
 
-  // === ЗАГРУЗКА СЦЕНЫ ИЗ JSON ===
-  try {
-    auto loader = SceneLoader::Load("assets/scene/billiard.json");
-    Scene scene = std::move(loader).GetScene();
+  // Инициализация менеджера текстур и загрузка основной сцены из JSON
+  TextureManager::GetInstance().Initialize();
+  auto sceneLoader = SceneLoader::Load("assets/scene/billiard.json");
 
-    RawImage image(800, 600);
-    Renderer renderer;
+  // Получение данных камеры из сцены
+  auto camera_opt = sceneLoader.GetCamera();
+  if (!camera_opt) {
+    std::cerr << "No camera in scene!" << std::endl;
+    return -1;
+  }
+  Camera camera = *camera_opt;
 
-    // Камера — проверяем optional
-    auto camera_opt = loader.GetCamera();
-    if (!camera_opt) {
-      throw std::runtime_error(
-          "Camera is missing in JSON, but required for rendering.");
-    }
+  // Пустая 1x1 текстура — используется как заглушка
+  RawImage dummy(1, 1);
+  Texture dummyTexture(dummy);
+  dummyTexture.createTexture();
 
-    renderer.Render(*camera_opt, scene, image);
+  // Настройка материалов, текстур и uniform'ов для бильярдных шаров
+  if (!AppUtils::SetupRaymarchBallRendering(raymarchShader)) {
+    std::cerr << "Failed to setup ball rendering" << std::endl;
+    return -1;
+  }
 
-    // Сохранение изображения в BMP файл
-    BMP bmp(image);
-    bmp.Write("output.bmp");
+  // Основной цикл приложения
+  bool running = true;
+  Uint32 lastTime = SDL_GetTicks();
+  const float moveSpeed = 3.0f;     // Скорость перемещения камеры
+  const float rotateSpeed = 90.0f;  // Скорость поворота камеры
 
-    // Создание OpenGL-текстуры
-    Texture texture(image);
-    texture.createTexture();
+  SDL_SetRelativeMouseMode(SDL_TRUE);  // Захват мыши для свободного обзора
 
-    // === ОСНОВНОЙ ЦИКЛ РЕНДЕРИНГА ===
-    bool running = true;
+  while (running) {
+    Uint32 now = SDL_GetTicks();
+    float dt = (now - lastTime) / 1000.0f;
+    lastTime = now;
+
+    // Обработка событий SDL
     SDL_Event event;
-    while (running) {
-      // Обработка событий SDL (закрытие окна, клавиатура и т.д.)
-      while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
-          running = false;  // Выход при закрытии окна
-        }
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_QUIT) {
+        running = false;
       }
-
-      glRenderer.Render(shader, texture);
-      // Обмен буферов: вывод кадра на экран
-      SDL_GL_SwapWindow(window);
     }
-    TextureManager::GetInstance().Shutdown();
-  } catch (const std::exception& e) {
-    std::cerr << "ERROR: " << e.what() << std::endl;
-    TextureManager::GetInstance().Shutdown();
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return -1;
+
+    // Обработка клавиатурного ввода
+    const Uint8* keys = SDL_GetKeyboardState(nullptr);
+
+    if (keys[SDL_SCANCODE_W]) {
+      camera.Move(camera.GetUpVec() * moveSpeed * dt);
+    }
+    if (keys[SDL_SCANCODE_S]) {
+      camera.Move(-camera.GetUpVec() * moveSpeed * dt);
+    }
+    if (keys[SDL_SCANCODE_A]) {
+      vec3 left = normalize(cross(camera.GetUpVec(), camera.GetViewVec()));
+      camera.Move(left * moveSpeed * dt);
+    }
+    if (keys[SDL_SCANCODE_D]) {
+      vec3 right = normalize(cross(camera.GetViewVec(), camera.GetUpVec()));
+      camera.Move(right * moveSpeed * dt);
+    }
+    if (keys[SDL_SCANCODE_SPACE]) {
+      camera.Move(camera.GetViewVec() * moveSpeed * dt);
+    }
+    if (keys[SDL_SCANCODE_LCTRL]) {
+      camera.Move(-camera.GetViewVec() * moveSpeed * dt);
+    }
+    if (keys[SDL_SCANCODE_ESCAPE]) {
+      running = false;
+    }
+
+    // Поворот камеры по движению мыши
+    int mx, my;
+    if (SDL_GetRelativeMouseState(&mx, &my) && (mx || my)) {
+      camera.Rotate(static_cast<float>(mx) * rotateSpeed * dt,
+                    -static_cast<float>(my) * rotateSpeed * dt);
+    }
+
+    // Передача параметров камеры в шейдер каждый кадр
+    raymarchShader.use();
+
+    vec3 right = normalize(cross(camera.GetViewVec(), camera.GetUpVec()));
+    raymarchShader.setVec3("cameraPos", camera.GetPosition());
+    raymarchShader.setVec3("cameraView", camera.GetViewVec());
+    raymarchShader.setVec3("cameraUp", camera.GetUpVec());
+    raymarchShader.setVec3("cameraRight", right);
+    raymarchShader.setFloat("tanFovHalf",
+                            std::tan(camera.GetFOV() * 3.14159265f / 360.0f));
+    raymarchShader.setVec2("resolution", 800.0f, 600.0f);
+
+    // Настройка освещения (точечный свет + глобальное направленное)
+    raymarchShader.setVec3("pointLightPos", vec3(0.0f, 2.7f, 10.0f));
+    raymarchShader.setVec3("pointLightColor", vec3(1.0f, 0.94f, 0.78f));
+    raymarchShader.setFloat("pointLightBrightness", 2.0f);
+    raymarchShader.setVec3("globalLightDir", vec3(0.0f, -1.0f, -0.5f));
+    raymarchShader.setVec3("globalLightColor", vec3(1.0f, 1.0f, 1.0f));
+    raymarchShader.setFloat("globalLightBrightness", 0.3f);
+
+    // Рендеринг сцены через полноэкранный квад и raymarch-шейдер
+    glRenderer.Render(raymarchShader, dummyTexture);
+    SDL_GL_SwapWindow(window);
   }
 
-  // === ОЧИСТКА РЕСУРСОВ ===
-  SDL_DestroyWindow(window);  // Удаление окна
-  SDL_Quit();                 // Завершение SDL
+  // Очистка ресурсов
+  SDL_DestroyWindow(window);
+  SDL_Quit();
   return 0;
 }

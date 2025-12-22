@@ -68,9 +68,29 @@ void Shader::use() const {
 }
 
 // Устанавливает значение uniform-переменной типа int
-// Используется для указания номера текстурного юнита
 void Shader::setInt(const std::string& name, int value) const {
   glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
+}
+
+// Устанавливает значение uniform-переменной типа float
+void Shader::setFloat(const std::string& name, float value) const {
+  glUniform1f(glGetUniformLocation(programID, name.c_str()), value);
+}
+
+// Устанавливает uniform типа vec2 (два float)
+void Shader::setVec2(const std::string& name, float x, float y) const {
+  glUniform2f(glGetUniformLocation(programID, name.c_str()), x, y);
+}
+
+// Устанавливает uniform типа vec3 (три float)
+void Shader::setVec3(const std::string& name, float x, float y, float z) const {
+  glUniform3f(glGetUniformLocation(programID, name.c_str()), x, y, z);
+}
+
+// Перегрузка для передачи vec3 напрямую из структуры
+void Shader::setVec3(const std::string& name, const vec3& value) const {
+  glUniform3f(glGetUniformLocation(programID, name.c_str()), value[0], value[1],
+              value[2]);
 }
 
 std::string Shader::readFile(const std::string& path) {
