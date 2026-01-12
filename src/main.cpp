@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 
 #include "gl/gl_renderer.h"
 #include "gl/shader.h"
@@ -76,17 +78,36 @@ int main(int argc, char* argv[]) {
   // Основной цикл приложения
   bool running = true;
   Uint32 lastTime = SDL_GetTicks();
-  const float moveSpeed = 3.0f;     // Скорость перемещения камеры
-  const float rotateSpeed = 90.0f;  // Скорость поворота камеры
+  Uint32 lastFPSTime = lastTime;
+  int frameCount = 0;
+  float smoothFPS = 60.0f;
+  float currentFPS = 0.0f;
 
-  SDL_SetRelativeMouseMode(SDL_TRUE);  // Захват мыши для свободного обзора
+  const float moveSpeed = 3.0f;
+  const float rotateSpeed = 90.0f;
+
+  SDL_SetRelativeMouseMode(SDL_TRUE);
 
   while (running) {
     Uint32 now = SDL_GetTicks();
     float dt = (now - lastTime) / 1000.0f;
     lastTime = now;
 
-    // Обработка событий SDL
+    // Расчет FPS
+    ++frameCount;
+    Uint32 elapsedSinceLastFPS = now - lastFPSTime;
+    if (elapsedSinceLastFPS >= 200) {  // каждые 0.2 секунды
+      currentFPS = frameCount * 1000.0f / elapsedSinceLastFPS;
+      frameCount = 0;
+      lastFPSTime = now;
+
+      std::ostringstream title;
+      title << "Game Engine | FPS: " << std::fixed << std::setprecision(1)
+            << currentFPS;
+      SDL_SetWindowTitle(window, title.str().c_str());
+    }
+
+    // Обработка событий
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
