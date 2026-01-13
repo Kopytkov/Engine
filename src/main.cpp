@@ -70,8 +70,8 @@ int main(int argc, char* argv[]) {
   dummyTexture.createTexture();
 
   // Настройка материалов, текстур и uniform'ов для бильярдных шаров
-  static std::vector<Texture> g_ballTextures;
-  static std::vector<BallMaterialGPU> g_ballMaterialsGPU;
+  std::vector<Texture> g_ballTextures;
+  std::vector<BallMaterialGPU> g_ballMaterialsGPU;
 
   if (!AppUtils::InitRaymarchBallResources(raymarchShader, g_ballTextures,
                                            g_ballMaterialsGPU)) {
