@@ -70,10 +70,17 @@ int main(int argc, char* argv[]) {
   dummyTexture.createTexture();
 
   // Настройка материалов, текстур и uniform'ов для бильярдных шаров
-  if (!AppUtils::SetupRaymarchBallRendering(raymarchShader)) {
-    std::cerr << "Failed to setup ball rendering" << std::endl;
+  static std::vector<Texture> g_ballTextures;
+  static std::vector<BallMaterialGPU> g_ballMaterialsGPU;
+
+  if (!AppUtils::InitRaymarchBallResources(raymarchShader, g_ballTextures,
+                                           g_ballMaterialsGPU)) {
+    std::cerr << "Failed to init raymarch ball resources\n";
     return -1;
   }
+
+  // Привязываем текстуры шаров
+  AppUtils::BindBallTextures(g_ballTextures, raymarchShader);
 
   // Основной цикл приложения
   bool running = true;
@@ -148,6 +155,9 @@ int main(int argc, char* argv[]) {
       camera.Rotate(static_cast<float>(mx) * rotateSpeed * dt,
                     -static_cast<float>(my) * rotateSpeed * dt);
     }
+
+    // Обновляем позиции шаров каждый кадр
+    AppUtils::UpdateBallPositions(raymarchShader, sceneLoader.GetScene());
 
     // Передача параметров камеры в шейдер каждый кадр
     raymarchShader.use();
