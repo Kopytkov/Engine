@@ -7,101 +7,83 @@
 #include "bmp/bmp.h"
 #include "math/vec.h"
 #include "raw_image.h"
+#include "scene_object_sphere.h"
 #include "texture.h"
 #include "texture_manager.h"
 
 using json = nlohmann::json;
 
-// Структура, повторяющая layout в шейдере
-struct BallMaterialGPU {
-  vec3 baseColor;
-  float roughness;
-  float metallic;
-  float transmission;
-  float refraction;
-  int textureID;
-  float padding[2];
-};
+bool AppUtils::InitRaymarchBallResources(
+    Shader& raymarchShader,
+    std::vector<Texture>& outTextures,
+    std::vector<BallMaterialGPU>& outMaterials) {
+  outTextures.clear();
+  outMaterials.clear();
 
-bool AppUtils::SetupRaymarchBallRendering(Shader& raymarchShader) {
-  static std::vector<Texture> ballTextures;
-  static std::vector<BallMaterialGPU> ballMaterialsGPU;
-
-  // Очистка на случай повторного вызова
-  ballTextures.clear();
-  ballMaterialsGPU.clear();
-
-  // Открываем JSON-файл с описанием всех шаров
-  std::ifstream sphereFile("assets/scene/objects/sphere.json");
-  if (!sphereFile.is_open()) {
-    std::cerr << "Cannot open sphere.json" << std::endl;
+  // Загружаем описание шаров при инициализации
+  std::ifstream file("assets/scene/objects/sphere.json");
+  if (!file.is_open()) {
+    std::cerr << "Cannot open sphere.json\n";
     return false;
   }
 
-  json sphereJson;
-  sphereFile >> sphereJson;
+  json j;
+  file >> j;
 
-  // Определяем количество шаров
-  const size_t numBalls = sphereJson.size();
-
-  if (numBalls == 0) {
-    std::cerr << "No balls defined in sphere.json" << std::endl;
+  size_t n = j.size();
+  if (n == 0) {
+    std::cerr << "No spheres defined in sphere.json\n";
+    return false;
+  }
+  if (n > 16) {
+    std::cerr << "Too many spheres: " << n << " (max 16 in shader)\n";
     return false;
   }
 
-  // Защита от превышения лимита массива в шейдере
-  if (numBalls > 64) {
-    std::cerr << "Too many balls (" << numBalls << "), maximum supported: 64"
-              << std::endl;
-    return false;
-  }
+  outTextures.reserve(n);
+  outMaterials.resize(n);
 
-  // Резервируем память заранее для производительности
-  ballTextures.reserve(numBalls);
-  ballMaterialsGPU.resize(numBalls);
+  // Парсим каждый шар
+  for (size_t i = 0; i < n; ++i) {
+    const auto& entry = j[i];
+    std::string name = entry.value("name", "");
 
-  // Основной цикл: обработка каждого шара из JSON
-  for (size_t i = 0; i < numBalls; ++i) {
-    const auto& ball = sphereJson[i];
-    std::string name = ball["name"].get<std::string>();
-    const auto& matJson = ball["material"];
+    const auto& m = entry["material"];
 
-    BallMaterialGPU& mat = ballMaterialsGPU[i];
-
-    // Базовые параметры материала
-    mat.baseColor =
-        vec3(matJson["color"][0].get<float>(), matJson["color"][1].get<float>(),
-             matJson["color"][2].get<float>());
-    mat.roughness = matJson.value("roughness", 0.2f);
-    mat.metallic = matJson.value("metallic", 0.0f);
-    mat.transmission = matJson.value("transparency", 0.0f);
-    mat.refraction = matJson.value("refraction", 1.5f);
-    mat.textureID = -1;  // -1 означает "без текстуры"
+    BallMaterialGPU& mat = outMaterials[i];
+    mat.baseColor = vec3(m["color"][0], m["color"][1], m["color"][2]);
+    mat.roughness = m.value("roughness", 0.2f);
+    mat.metallic = m.value("metallic", 0.0f);
+    mat.transmission = m.value("transparency", 0.0f);
+    mat.refraction = m.value("refraction", 1.5f);
+    mat.textureID = -1;
     mat.padding[0] = mat.padding[1] = 0.0f;
 
-    // Если у шара указана текстура — загружаем её
-    if (matJson.contains("texture")) {
-      std::string texPath = TextureManager::GetInstance().GetTexturePath(name);
-      RawImage texImage = loadFromBMP(texPath);
-
-      if (texImage.GetWidth() == 0 || texImage.GetHeight() == 0) {
-        std::cerr << "Failed to load texture for ball '" << name
-                  << "': " << texPath << std::endl;
-        continue;
+    // Загружаем текстуру только если указана и имя шара известно
+    if (m.contains("texture") && !name.empty()) {
+      try {
+        std::string path = TextureManager::GetInstance().GetTexturePath(name);
+        RawImage img = loadFromBMP(path);
+        if (img.GetWidth() > 0 && img.GetHeight() > 0) {
+          outTextures.emplace_back(img);
+          outTextures.back().createTexture();
+          mat.textureID = static_cast<int>(outTextures.size() - 1);
+        } else {
+          std::cerr << "Failed to load texture: " << path << "\n";
+        }
+      } catch (const std::exception& e) {
+        std::cerr << "Texture error for '" << name << "': " << e.what() << "\n";
       }
-
-      ballTextures.emplace_back(texImage);
-      ballTextures.back().createTexture();  // Генерация GL-текстуры
-      mat.textureID = static_cast<int>(ballTextures.size() - 1);
     }
   }
 
-  // Передаём материалы в шейдер
+  // Передаём неизменяемые uniform'ы
   raymarchShader.use();
 
-  for (size_t i = 0; i < numBalls; ++i) {
+  // Материалы шаров
+  for (size_t i = 0; i < n; ++i) {
     std::string idx = "[" + std::to_string(i) + "]";
-    const BallMaterialGPU& mat = ballMaterialsGPU[i];
+    const auto& mat = outMaterials[i];
 
     raymarchShader.setVec3("ballMaterials" + idx + ".baseColor", mat.baseColor);
     raymarchShader.setFloat("ballMaterials" + idx + ".roughness",
@@ -114,30 +96,41 @@ bool AppUtils::SetupRaymarchBallRendering(Shader& raymarchShader) {
     raymarchShader.setInt("ballMaterials" + idx + ".textureID", mat.textureID);
   }
 
-  // Привязываем загруженные текстуры
-  for (size_t i = 0; i < ballTextures.size(); ++i) {
-    glActiveTexture(GL_TEXTURE1 + static_cast<GLenum>(i));
-    ballTextures[i].bindTexture();
-    raymarchShader.setInt("ballTextures[" + std::to_string(i) + "]",
-                          1 + static_cast<int>(i));
-  }
-
-  // Передаём позиции шаров из JSON в uniform-массив шейдера
-  for (size_t i = 0; i < numBalls; ++i) {
-    const auto& ball = sphereJson[i];
-    const auto& posJson = ball["position"];
-    vec3 pos(posJson[0].get<float>(), posJson[1].get<float>(),
-             posJson[2].get<float>());
-
-    std::string idx = "[" + std::to_string(i) + "]";
-    raymarchShader.setVec3("ballPositions" + idx, pos);
-  }
-
-  // Передаём количество шаров в шейдер
-  raymarchShader.setInt("ballCount", static_cast<int>(numBalls));
-
-  // Радиус шаров
+  // Статические параметры сцены
+  raymarchShader.setInt("ballCount", static_cast<int>(n));
   raymarchShader.setFloat("ballRadius", 1.35f);
 
   return true;
+}
+
+void AppUtils::UpdateBallPositions(Shader& raymarchShader, const Scene& scene) {
+  int count = 0;
+  const auto& objects = scene.GetObjects();
+
+  for (const auto& objPtr : objects) {
+    if (count >= 16) {
+      break;  // Максимум 16 шаров в шейдере
+    }
+
+    if (auto* sphere = dynamic_cast<Sphere*>(objPtr.get())) {
+      std::string idx = "[" + std::to_string(count) + "]";
+      vec3 pos = sphere->GetPosition();
+      raymarchShader.setVec3("ballPositions" + idx, pos);
+      count++;
+    }
+  }
+}
+
+void AppUtils::BindBallTextures(const std::vector<Texture>& textures,
+                                Shader& shader) {
+  shader.use();
+
+  for (size_t i = 0; i < textures.size(); ++i) {
+    glActiveTexture(GL_TEXTURE1 + static_cast<GLenum>(i));
+    textures[i].bindTexture();
+
+    // Явно указываем шейдеру номер текстурного юнита
+    std::string uniformName = "ballTextures[" + std::to_string(i) + "]";
+    shader.setInt(uniformName, 1 + static_cast<int>(i));
+  }
 }
