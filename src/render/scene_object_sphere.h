@@ -1,5 +1,6 @@
-#include "scene_object.h"
+#pragma once
 #include "control/property.h"
+#include "scene_object.h"
 
 class Sphere : public SceneObject, public PositionProperty {
  public:
@@ -7,6 +8,7 @@ class Sphere : public SceneObject, public PositionProperty {
   float SDF(const vec3& point) const override;
   vec3 getNormal(const vec3& point) const override;
   const Material& GetMaterial() const override;
+  void UpdateUniforms(Shader& shader) const override {};
 
  private:
   float radius_;

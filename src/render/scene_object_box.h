@@ -1,6 +1,6 @@
 #pragma once
-#include "scene_object.h"
 #include "control/property.h"
+#include "scene_object.h"
 
 class Box : public SceneObject, public PositionProperty {
  public:
@@ -8,6 +8,7 @@ class Box : public SceneObject, public PositionProperty {
   float SDF(const vec3& point) const override;
   vec3 getNormal(const vec3& point) const override;
   const Material& GetMaterial() const override;
+  void UpdateUniforms(Shader& shader) const override {};
 
  private:
   vec3 vertex_;

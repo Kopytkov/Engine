@@ -103,24 +103,6 @@ bool AppUtils::InitRaymarchBallResources(
   return true;
 }
 
-void AppUtils::UpdateBallPositions(Shader& raymarchShader, const Scene& scene) {
-  int count = 0;
-  const auto& objects = scene.GetObjects();
-
-  for (const auto& objPtr : objects) {
-    if (count >= 16) {
-      break;  // Максимум 16 шаров в шейдере
-    }
-
-    if (auto* sphere = dynamic_cast<Sphere*>(objPtr.get())) {
-      std::string idx = "[" + std::to_string(count) + "]";
-      vec3 pos = sphere->GetPosition();
-      raymarchShader.setVec3("ballPositions" + idx, pos);
-      count++;
-    }
-  }
-}
-
 void AppUtils::BindBallTextures(const std::vector<Texture>& textures,
                                 Shader& shader) {
   shader.use();
