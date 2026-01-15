@@ -23,9 +23,6 @@ class AppUtils {
       std::vector<Texture>& outBallTextures,
       std::vector<BallMaterialGPU>& outMaterialsGPU);
 
-  // Ежекадровое обновление позиций
-  static void UpdateBallPositions(Shader& raymarchShader, const Scene& scene);
-
   // Привязка всех текстур шаров к текстурным юнитам
   static void BindBallTextures(const std::vector<Texture>& textures,
                                Shader& shader);

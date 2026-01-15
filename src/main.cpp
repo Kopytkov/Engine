@@ -156,8 +156,8 @@ int main(int argc, char* argv[]) {
                     -static_cast<float>(my) * rotateSpeed * dt);
     }
 
-    // Обновляем позиции шаров каждый кадр
-    AppUtils::UpdateBallPositions(raymarchShader, sceneLoader.GetScene());
+    // Обновление uniform'ов всех объектов
+    glRenderer.UpdateUniforms(sceneLoader.GetScene(), raymarchShader);
 
     // Передача параметров камеры в шейдер каждый кадр
     raymarchShader.use();
