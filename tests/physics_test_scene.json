@@ -1,0 +1,9 @@
+{
+  "camera": { "ref": "../assets/scene/camera.json" },
+  "lights": { "ref": "../assets/scene/light.json" },
+  "objects": [
+    { "ref": "objects/test_spheres.json" },
+    { "ref": "../assets/scene/objects/table.json" },
+    { "ref": "../assets/scene/objects/borders.json" }
+  ]
+}

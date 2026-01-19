@@ -19,6 +19,7 @@ class AppUtils {
  public:
   // Одноразовая инициализация ресурсов и статических uniform'ов
   static bool InitRaymarchBallResources(
+      const Scene& scene,
       Shader& raymarchShader,
       std::vector<Texture>& outBallTextures,
       std::vector<BallMaterialGPU>& outMaterialsGPU);

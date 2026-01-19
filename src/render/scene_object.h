@@ -8,11 +8,19 @@ class SceneObject {
  public:
   virtual ~SceneObject() = default;
 
+  // Методы для рендеринга
   virtual float SDF(const vec3& point) const = 0;
-
   virtual vec3 getNormal(const vec3& point) const = 0;
-
   virtual const Material& GetMaterial() const = 0;
+  virtual void UpdateUniforms(Shader& shader) const;
 
-  virtual void UpdateUniforms(Shader& shader) const {}
+  // Методы для физики
+  virtual void IntegrateState(float deltaTime);
+  void SetVelocity(const vec3& velocity);
+  vec3 GetVelocity() const;
+  virtual void SetPosition(const vec3& position) = 0;
+  virtual vec3 GetPosition() const = 0;
+
+ protected:
+  vec3 velocity_{0.0f};
 };

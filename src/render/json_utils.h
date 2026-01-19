@@ -20,7 +20,6 @@ inline std::array<float, 3> parseVec3(const json& j, const std::string& ctx) {
 // Парсит material
 inline std::unique_ptr<Material> parseMaterial(const json& j) {
   RGB color{255, 255, 255};
-  std::shared_ptr<RawImage> albedoImage = nullptr;
 
   if (j.contains("color")) {
     auto c = j["color"];
@@ -32,19 +31,15 @@ inline std::unique_ptr<Material> parseMaterial(const json& j) {
                 static_cast<uint8_t>(c[2].get<float>() * 255)};
   }
 
-  if (j.contains("texture")) {
-    std::string path = j["texture"];
-    albedoImage = std::make_shared<RawImage>(loadFromBMP(path));
-  }
-
   std::string mat_type = j.value("type", "pbr");
   if (mat_type == "pbr") {
     float roughness = std::clamp(j.value("roughness", 0.18f), 0.03f, 1.0f);
     float metallic = std::clamp(j.value("metallic", 0.0f), 0.0f, 1.0f);
     float transmission = std::clamp(j.value("transparency", 0.0f), 0.0f, 1.0f);
     float refraction = j.value("refraction", 1.5f);
+    std::string textureName = j.value("texture", "");
     return std::make_unique<MaterialPBR>(color, roughness, metallic,
-                                         transmission, refraction, albedoImage);
+                                         transmission, refraction, textureName);
 
   } else if (mat_type == "phong") {
     float roughness = std::clamp(j.value("roughness", 0.1f), 0.0f, 1.0f);

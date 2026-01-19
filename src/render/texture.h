@@ -7,6 +7,14 @@ class Texture {
   explicit Texture(const RawImage& image);
   ~Texture();
 
+  // Запрещаем копирование
+  Texture(const Texture&) = delete;
+  Texture& operator=(const Texture&) = delete;
+
+  // Разрешаем перемещение
+  Texture(Texture&& other) noexcept;
+  Texture& operator=(Texture&& other) noexcept;
+
   // Создаёт OpenGL-текстуру из данных изображения
   void createTexture();
 
