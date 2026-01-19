@@ -55,21 +55,21 @@ int main(int argc, char* argv[]) {
   // Инициализация менеджера текстур и загрузка основной сцены из JSON
   TextureManager::GetInstance().Initialize();
   auto sceneLoader = SceneLoader::Load("assets/scene/billiard.json");
-
   auto& scene = sceneLoader.GetScene();
-  auto& objects = scene.GetObjects();
 
-  // Тест на проверку столкновения шаров
-  if (objects.size() >= 2) {
-    auto* ball_1 = dynamic_cast<Sphere*>(objects[0].get());
-    auto* ball_2 = dynamic_cast<Sphere*>(objects[1].get());
+  // auto& objects = scene.GetObjects();
 
-    if (ball_1 && ball_2) {
-      // Задаем скорости шарам навстречу друг другу
-      ball_1->SetVelocity(vec3(0.0f, 2.0f, 0.0f));   // летит вверх
-      ball_2->SetVelocity(vec3(0.0f, -2.0f, 0.0f));  // летит вниз
-    }
-  }
+  // // Тест на проверку столкновения шаров
+  // if (objects.size() >= 2) {
+  //   auto* ball_1 = dynamic_cast<Sphere*>(objects[0].get());
+  //   auto* ball_2 = dynamic_cast<Sphere*>(objects[1].get());
+
+  //   if (ball_1 && ball_2) {
+  //     // Задаем скорости шарам навстречу друг другу
+  //     ball_1->SetVelocity(vec3(0.0f, 2.0f, 0.0f));   // летит вверх
+  //     ball_2->SetVelocity(vec3(0.0f, -2.0f, 0.0f));  // летит вниз
+  //   }
+  // }
 
   // Получение данных камеры из сцены
   auto camera_opt = sceneLoader.GetCamera();
