@@ -5,8 +5,8 @@ Box::Box(const vec3& position,
          const vec3& vertex,
          std::unique_ptr<Material> mat)
     : vertex_(abs(vertex)), material_(std::move(mat)) {
-      SetPosition(position);
-    }
+  PositionProperty::SetPosition(position);
+}
 
 float Box::SDF(const vec3& point) const {
   vec3 q = abs(point - GetPosition()) - vertex_;
@@ -26,4 +26,14 @@ vec3 Box::getNormal(const vec3& point) const {
 
 const Material& Box::GetMaterial() const {
   return *material_.get();
+}
+
+void Box::UpdateUniforms(Shader& shader) const {}
+
+vec3 Box::GetPosition() const {
+  return PositionProperty::GetPosition();
+}
+
+void Box::SetPosition(const vec3& position) {
+  PositionProperty::SetPosition(position);
 }

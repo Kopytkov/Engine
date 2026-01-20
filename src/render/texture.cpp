@@ -8,6 +8,32 @@ Texture::~Texture() {
   }
 }
 
+// Конструктор перемещения
+// Забирает OpenGL-ресурс у временного объекта (other),
+// предотвращая его удаление в деструкторе "донора"
+Texture::Texture(Texture&& other) noexcept
+    : image_(std::move(other.image_)), textureID_(other.textureID_) {
+  // Обнуляем ID "донора", чтобы его деструктор не освободил наш ресурс
+  other.textureID_ = 0;
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+  if (this != &other) {
+    // Освобождаем свой собственный ресурс перед тем, как взять чужой
+    if (textureID_ != 0) {
+      glDeleteTextures(1, &textureID_);
+    }
+
+    // Крадем данные и ID
+    image_ = std::move(other.image_);
+    textureID_ = other.textureID_;
+
+    // Обнуляем "донора"
+    other.textureID_ = 0;
+  }
+  return *this;
+}
+
 // Создаёт OpenGL-текстуру из данных в image_
 // Использует формат GL_BGR, так как BMP хранит данные в порядке BGR
 void Texture::createTexture() {

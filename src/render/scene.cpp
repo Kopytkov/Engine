@@ -1,4 +1,14 @@
 #include "scene.h"
+#include "physics_engine.h"
+
+Scene::Scene() {
+  physics_engine_ = std::make_unique<PhysicsEngine>();
+}
+
+Scene::~Scene() = default;
+
+Scene::Scene(Scene&&) = default;
+Scene& Scene::operator=(Scene&&) = default;
 
 void Scene::AddObject(std::unique_ptr<SceneObject> object) {
   objects_.push_back(std::move(object));
@@ -6,6 +16,20 @@ void Scene::AddObject(std::unique_ptr<SceneObject> object) {
 
 void Scene::AddLight(std::unique_ptr<LightSource> light) {
   lights_.push_back(std::move(light));
+}
+
+void Scene::UpdatePhysics(float deltaTime) {
+  // Обрабатываем столкновения
+  if (physics_engine_) {
+    physics_engine_->ProcessCollisions(*this, deltaTime);
+  }
+
+  // Обновляем позиции
+  for (const auto& obj : objects_) {
+    if (obj) {
+      obj->IntegrateState(deltaTime);
+    }
+  }
 }
 
 const std::vector<std::unique_ptr<SceneObject>>& Scene::GetObjects() const {

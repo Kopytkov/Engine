@@ -13,6 +13,7 @@ class SceneLoader {
   static SceneLoader Load(const std::string& jsonPath);
 
   // Получение данных
+  Scene& GetScene() & { return scene_; }
   const Scene& GetScene() const& { return scene_; }
   Scene&& GetScene() && { return std::move(scene_); }
   std::optional<Camera> GetCamera() const { return camera_; }

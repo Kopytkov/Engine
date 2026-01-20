@@ -1,0 +1,24 @@
+[
+  {
+    "type": "sphere",
+    "name": "cue_ball_test",
+    "position": [0.0, -5.0, 0.0],
+    "radius": 1.35,
+    "material": {
+      "color": [1.0, 1.0, 1.0],
+      "roughness": 0.1,
+      "texture": "assets/textures/ball_glass_test.bmp"
+    }
+  },
+  {
+    "type": "sphere",
+    "name": "target_ball_test",
+    "position": [0.0, 5.0, 0.0],
+    "radius": 1.35,
+    "material": {
+      "color": [1.0, 1.0, 0.0],
+      "roughness": 0.1,
+      "texture": "assets/textures/ball_9_yellow_stripe.bmp"
+    }
+  }
+]

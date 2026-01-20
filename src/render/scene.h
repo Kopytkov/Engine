@@ -23,21 +23,24 @@ struct Hit {
   SceneObject* obj;
 };
 
+class PhysicsEngine;
+
 class Scene {
  public:
-  Scene() = default;
-  ~Scene() = default;
+  Scene();
+  ~Scene();
 
   // Запретить копирование
   Scene(const Scene&) = delete;
   Scene& operator=(const Scene&) = delete;
 
   // Разрешить перемещение
-  Scene(Scene&&) = default;
-  Scene& operator=(Scene&&) = default;
+  Scene(Scene&&);
+  Scene& operator=(Scene&&);
 
   void AddObject(std::unique_ptr<SceneObject> object);
   void AddLight(std::unique_ptr<LightSource> light);
+  void UpdatePhysics(float deltaTime);
   const std::vector<std::unique_ptr<SceneObject>>& GetObjects() const;
   const std::vector<std::unique_ptr<LightSource>>& GetLights() const;
   vec3 CastRay(const Ray& ray, int depth) const;
@@ -51,6 +54,7 @@ class Scene {
  private:
   std::vector<std::unique_ptr<SceneObject>> objects_;
   std::vector<std::unique_ptr<LightSource>> lights_;
+  std::unique_ptr<PhysicsEngine> physics_engine_;
 
   std::tuple<float, SceneObject*> GetDistance(
       const vec3& position,

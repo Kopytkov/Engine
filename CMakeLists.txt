@@ -47,6 +47,8 @@ add_executable(Engine
  src/render/material.cpp
  src/render/object_parser.h
  src/render/object_parser.cpp
+ src/render/physics_engine.h
+ src/render/physics_engine.cpp
  src/render/ray.h
  src/render/ray.cpp
  src/render/raw_image.h

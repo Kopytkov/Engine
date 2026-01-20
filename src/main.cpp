@@ -55,6 +55,21 @@ int main(int argc, char* argv[]) {
   // Инициализация менеджера текстур и загрузка основной сцены из JSON
   TextureManager::GetInstance().Initialize();
   auto sceneLoader = SceneLoader::Load("assets/scene/billiard.json");
+  auto& scene = sceneLoader.GetScene();
+
+  // auto& objects = scene.GetObjects();
+
+  // // Тест на проверку столкновения шаров
+  // if (objects.size() >= 2) {
+  //   auto* ball_1 = dynamic_cast<Sphere*>(objects[0].get());
+  //   auto* ball_2 = dynamic_cast<Sphere*>(objects[1].get());
+
+  //   if (ball_1 && ball_2) {
+  //     // Задаем скорости шарам навстречу друг другу
+  //     ball_1->SetVelocity(vec3(0.0f, 2.0f, 0.0f));   // летит вверх
+  //     ball_2->SetVelocity(vec3(0.0f, -2.0f, 0.0f));  // летит вниз
+  //   }
+  // }
 
   // Получение данных камеры из сцены
   auto camera_opt = sceneLoader.GetCamera();
@@ -73,8 +88,8 @@ int main(int argc, char* argv[]) {
   std::vector<Texture> g_ballTextures;
   std::vector<BallMaterialGPU> g_ballMaterialsGPU;
 
-  if (!AppUtils::InitRaymarchBallResources(raymarchShader, g_ballTextures,
-                                           g_ballMaterialsGPU)) {
+  if (!AppUtils::InitRaymarchBallResources(
+          scene, raymarchShader, g_ballTextures, g_ballMaterialsGPU)) {
     std::cerr << "Failed to init raymarch ball resources\n";
     return -1;
   }
@@ -84,6 +99,13 @@ int main(int argc, char* argv[]) {
 
   // Основной цикл приложения
   bool running = true;
+
+  // Логика фиксированного шага времени
+  float timeAccumulator = 0.0f;  // Накапливает время кадра
+  const int PHYSICS_UPDATES_PER_SECOND = 60;
+  const float fixedDeltaTime = 1.0f / PHYSICS_UPDATES_PER_SECOND;
+
+  // Переменные для расчета FPS
   Uint32 lastTime = SDL_GetTicks();
   Uint32 lastFPSTime = lastTime;
   int frameCount = 0;
@@ -97,8 +119,9 @@ int main(int argc, char* argv[]) {
 
   while (running) {
     Uint32 now = SDL_GetTicks();
-    float dt = (now - lastTime) / 1000.0f;
+    float frameTime = (now - lastTime) / 1000.0f;
     lastTime = now;
+    timeAccumulator += frameTime;
 
     // Расчет FPS
     ++frameCount;
@@ -126,24 +149,24 @@ int main(int argc, char* argv[]) {
     const Uint8* keys = SDL_GetKeyboardState(nullptr);
 
     if (keys[SDL_SCANCODE_W]) {
-      camera.Move(camera.GetUpVec() * moveSpeed * dt);
+      camera.Move(camera.GetUpVec() * moveSpeed * frameTime);
     }
     if (keys[SDL_SCANCODE_S]) {
-      camera.Move(-camera.GetUpVec() * moveSpeed * dt);
+      camera.Move(-camera.GetUpVec() * moveSpeed * frameTime);
     }
     if (keys[SDL_SCANCODE_A]) {
       vec3 left = normalize(cross(camera.GetUpVec(), camera.GetViewVec()));
-      camera.Move(left * moveSpeed * dt);
+      camera.Move(left * moveSpeed * frameTime);
     }
     if (keys[SDL_SCANCODE_D]) {
       vec3 right = normalize(cross(camera.GetViewVec(), camera.GetUpVec()));
-      camera.Move(right * moveSpeed * dt);
+      camera.Move(right * moveSpeed * frameTime);
     }
     if (keys[SDL_SCANCODE_SPACE]) {
-      camera.Move(camera.GetViewVec() * moveSpeed * dt);
+      camera.Move(camera.GetViewVec() * moveSpeed * frameTime);
     }
     if (keys[SDL_SCANCODE_LCTRL]) {
-      camera.Move(-camera.GetViewVec() * moveSpeed * dt);
+      camera.Move(-camera.GetViewVec() * moveSpeed * frameTime);
     }
     if (keys[SDL_SCANCODE_ESCAPE]) {
       running = false;
@@ -152,8 +175,14 @@ int main(int argc, char* argv[]) {
     // Поворот камеры по движению мыши
     int mx, my;
     if (SDL_GetRelativeMouseState(&mx, &my) && (mx || my)) {
-      camera.Rotate(static_cast<float>(mx) * rotateSpeed * dt,
-                    -static_cast<float>(my) * rotateSpeed * dt);
+      camera.Rotate(static_cast<float>(mx) * rotateSpeed * frameTime,
+                    -static_cast<float>(my) * rotateSpeed * frameTime);
+    }
+
+    // Цикл обновления физики
+    while (timeAccumulator >= fixedDeltaTime) {
+      sceneLoader.GetScene().UpdatePhysics(fixedDeltaTime);
+      timeAccumulator -= fixedDeltaTime;
     }
 
     // Обновление uniform'ов всех объектов
