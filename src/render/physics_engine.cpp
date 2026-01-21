@@ -5,7 +5,7 @@
 void PhysicsEngine::ProcessCollisions(Scene& scene, float deltaTime) {
   auto& objects = scene.GetObjects();
 
-  // Проверяем каждую пару объектов на столкновение
+  // Столкновения Шар-Шар
   for (size_t i = 0; i < objects.size(); ++i) {
     for (size_t j = i + 1; j < objects.size(); ++j) {
       // Определяем, является ли пара объектов двумя сферами
@@ -62,6 +62,40 @@ void PhysicsEngine::ProcessCollisions(Scene& scene, float deltaTime) {
           sphereB->SetVelocity(vB + delta_vB);
         }
       }
+    }
+  }
+
+  const auto& bounds = scene.GetTableBounds();
+
+  // Столкновения Шар-Стол
+  for (const auto& obj : objects) {
+    if (auto* sphere = dynamic_cast<Sphere*>(obj.get())) {
+      vec3 pos = sphere->GetPosition();
+      vec3 vel = sphere->GetVelocity();
+      float radius = sphere->GetRadius();
+      float damping = 0.8f;  // Коэффициент затухания при столкновении со столом
+
+      // Проверка по оси X
+      if (pos[0] - radius < bounds.min[0]) {
+        pos[0] = bounds.min[0] + radius;
+        vel[0] = -vel[0] * damping;
+      } else if (pos[0] + radius > bounds.max[0]) {
+        pos[0] = bounds.max[0] - radius;
+        vel[0] = -vel[0] * damping;
+      }
+
+      // Проверка по оси Y
+      if (pos[1] - radius < bounds.min[1]) {
+        pos[1] = bounds.min[1] + radius;
+        vel[1] = -vel[1] * damping;
+      } else if (pos[1] + radius > bounds.max[1]) {
+        pos[1] = bounds.max[1] - radius;
+        vel[1] = -vel[1] * damping;
+      }
+
+      // Применяем обновленные позицию и скорость
+      sphere->SetPosition(pos);
+      sphere->SetVelocity(vel);
     }
   }
 }

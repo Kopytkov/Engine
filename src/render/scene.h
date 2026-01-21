@@ -17,6 +17,12 @@ class SceneFactory {
                                                    float r);
 };
 
+// Структура для описания Axis-Aligned Bounding Box (границы стола)
+struct AABB {
+  vec3 min;
+  vec3 max;
+};
+
 struct Hit {
   vec3 position;
   vec3 normal;
@@ -43,6 +49,7 @@ class Scene {
   void UpdatePhysics(float deltaTime);
   const std::vector<std::unique_ptr<SceneObject>>& GetObjects() const;
   const std::vector<std::unique_ptr<LightSource>>& GetLights() const;
+  const AABB& GetTableBounds() const;
   vec3 CastRay(const Ray& ray, int depth) const;
 
   std::optional<Hit> GetHit(const Ray& ray,
@@ -55,6 +62,7 @@ class Scene {
   std::vector<std::unique_ptr<SceneObject>> objects_;
   std::vector<std::unique_ptr<LightSource>> lights_;
   std::unique_ptr<PhysicsEngine> physics_engine_;
+  AABB tableBounds_;
 
   std::tuple<float, SceneObject*> GetDistance(
       const vec3& position,

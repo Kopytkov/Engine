@@ -3,6 +3,10 @@
 
 Scene::Scene() {
   physics_engine_ = std::make_unique<PhysicsEngine>();
+
+  // Временные границы бильярдного стола
+  tableBounds_.min = vec3(-9.0f, -3.3f, 0.0f);
+  tableBounds_.max = vec3(9.0f, 8.7f, 1.0f);
 }
 
 Scene::~Scene() = default;
@@ -38,6 +42,10 @@ const std::vector<std::unique_ptr<SceneObject>>& Scene::GetObjects() const {
 
 const std::vector<std::unique_ptr<LightSource>>& Scene::GetLights() const {
   return lights_;
+}
+
+const AABB& Scene::GetTableBounds() const {
+  return tableBounds_;
 }
 
 vec3 Scene::CastRay(const Ray& ray, int depth) const {
