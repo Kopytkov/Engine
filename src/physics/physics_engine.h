@@ -1,6 +1,6 @@
 #pragma once
 
-class Scene;
+#include "render/scene.h"
 
 class PhysicsEngine {
  public:

@@ -8,11 +8,14 @@ const float MAX_TRACE_DIST = 150.0;  // Дальность прорисовки
 const float HIT_THRESHOLD  = 0.001;  // Порог столкновения
 const float SURFACE_BIAS   = 0.02;   // Смещение луча от поверхности (чтобы не было "дырок" и самопересечений)
 
-// Параметры сцены
-const float TABLE_WIDTH  = 8.85;
-const float TABLE_HEIGHT = 5.85;
-const float TABLE_Z_POS  = -2.37;    // Позиция центра коробки стола по вертикали
-const float BORDER_WIDTH = 0.15;     // Толщина бортов
+// Параметры стола
+const float TABLE_WIDTH  = 15.0;
+const float TABLE_HEIGHT = 20.0;
+const float TABLE_Z_POS  = -1.0; 
+
+// Параметры бортов
+const float BORDER_THICKNESS = 0.5; // Полу-толщина борта
+const float BORDER_HEIGHT    = 1.5; // Полу-высота борта
 
 // Uniforms (Камера, Свет, Материалы)
 uniform vec3 cameraPos, cameraView, cameraUp, cameraRight;
@@ -57,7 +60,7 @@ float sceneSDF(vec3 p, out int hitType, out int ballIndex, bool ignoreTransparen
     float min_dist = 1e10; // Изначально расстояние "бесконечное"
 
     // Стол
-    float table = sdBox(p, vec3(0.0, 2.7, TABLE_Z_POS), vec3(TABLE_WIDTH, TABLE_HEIGHT, 1.0));
+    float table = sdBox(p, vec3(0.0, 0.0, TABLE_Z_POS), vec3(TABLE_WIDTH, TABLE_HEIGHT, 1.0));
     if (table < min_dist) { 
         min_dist = table; 
         hitType = 1; 
@@ -65,10 +68,14 @@ float sceneSDF(vec3 p, out int hitType, out int ballIndex, bool ignoreTransparen
 
     // Борта
     float borders = 1e10;
-    borders = min(borders, sdBox(p, vec3(-9.0, 2.7, 0.0), vec3(BORDER_WIDTH, 6.0, 1.5)));
-    borders = min(borders, sdBox(p, vec3( 9.0, 2.7, 0.0), vec3(BORDER_WIDTH, 6.0, 1.5)));
-    borders = min(borders, sdBox(p, vec3(0.0, -3.3, 0.0), vec3(9.0, BORDER_WIDTH, 1.5)));
-    borders = min(borders, sdBox(p, vec3(0.0, 8.7, 0.0), vec3(9.0, BORDER_WIDTH, 1.5)));
+    vec3 vBorderSideSize = vec3(BORDER_THICKNESS, TABLE_HEIGHT + BORDER_THICKNESS, BORDER_HEIGHT);
+    borders = min(borders, sdBox(p, vec3(-TABLE_WIDTH, 0.0, 0.5), vBorderSideSize));
+    borders = min(borders, sdBox(p, vec3( TABLE_WIDTH, 0.0, 0.5), vBorderSideSize));
+
+    vec3 vBorderTopSize = vec3(TABLE_WIDTH + BORDER_THICKNESS, BORDER_THICKNESS, BORDER_HEIGHT);
+    borders = min(borders, sdBox(p, vec3(0.0, -TABLE_HEIGHT, 0.5), vBorderTopSize));
+    borders = min(borders, sdBox(p, vec3(0.0,  TABLE_HEIGHT, 0.5), vBorderTopSize));
+    
     if (borders < min_dist) { 
         min_dist = borders; 
         hitType = 2; 

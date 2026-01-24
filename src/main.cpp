@@ -8,6 +8,7 @@
 #include "render/app_utils.h"
 #include "render/camera.h"
 #include "render/raw_image.h"
+#include "render/scene_entity.h"
 #include "render/scene_loader.h"
 #include "render/texture.h"
 #include "render/texture_manager.h"
@@ -57,17 +58,17 @@ int main(int argc, char* argv[]) {
   auto sceneLoader = SceneLoader::Load("assets/scene/billiard.json");
   auto& scene = sceneLoader.GetScene();
 
-  // auto& objects = scene.GetObjects();
+  // const auto& entities = scene.GetEntities();
 
   // // Тест на проверку столкновения шаров
-  // if (objects.size() >= 2) {
-  //   auto* ball_1 = dynamic_cast<Sphere*>(objects[0].get());
-  //   auto* ball_2 = dynamic_cast<Sphere*>(objects[1].get());
+  // if (entities.size() >= 2) {
+  //   auto& ball_1 = entities[0];
+  //   auto& ball_2 = entities[1];
 
-  //   if (ball_1 && ball_2) {
+  //   if (ball_1->body && ball_2->body) {
   //     // Задаем скорости шарам навстречу друг другу
-  //     ball_1->SetVelocity(vec3(0.0f, 2.0f, 0.0f));   // летит вверх
-  //     ball_2->SetVelocity(vec3(0.0f, -2.0f, 0.0f));  // летит вниз
+  //     ball_1->body->SetVelocity(vec3(0.0f, 10.0f, 0.0f));   // летит вверх
+  //     ball_2->body->SetVelocity(vec3(0.0f, -10.0f, 0.0f));  // летит вниз
   //   }
   // }
 

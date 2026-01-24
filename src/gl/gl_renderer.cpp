@@ -1,6 +1,8 @@
 #include "gl_renderer.h"
 #include <iostream>
 #include "render/app_utils.h"
+#include "render/scene_entity.h"
+#include "render/scene_object_sphere.h"
 
 GLRenderer::GLRenderer(SDL_Window* window)
     : glContext_(nullptr), VAO_(0), VBO_(0), EBO_(0) {
@@ -63,17 +65,21 @@ void GLRenderer::BindTexture(const Texture& texture) {
 void GLRenderer::UpdateUniforms(const Scene& scene, Shader& shader) {
   shader.use();
 
-  // Итерация по всем объектам
-  const auto& objects = scene.GetObjects();
-  for (const auto& objPtr : objects) {
-    objPtr->UpdateUniforms(shader);
+  // Итерация по всем сущностям
+  const auto& entities = scene.GetEntities();
+  for (const auto& entity : entities) {
+    if (entity->object) {
+      entity->object->UpdateUniforms(shader);
+    }
   }
 
   // Собираем массив позиций для шаров
   std::vector<vec3> ballPositions;
-  for (const auto& objPtr : objects) {
-    if (auto* sphere = dynamic_cast<Sphere*>(objPtr.get())) {
-      ballPositions.push_back(sphere->GetPosition());
+  for (const auto& entity : entities) {
+    if (entity->object) {
+      if (auto* sphere = dynamic_cast<Sphere*>(entity->object.get())) {
+        ballPositions.push_back(sphere->GetRenderPosition());
+      }
     }
   }
 

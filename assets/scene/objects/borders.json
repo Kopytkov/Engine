@@ -1,26 +1,58 @@
 [
   {
     "type": "box",
-    "position": [-9, 2.7, 0.5],
-    "vertex": [0.15, 6, 1.5],
-    "material": { "color": [0.4, 0.2, 0.1] }
+    "name": "border_left",
+    "position": [-15, 0, 0.5], 
+    "vertex": [0.5, 20.5, 1.5],
+    "material": { 
+      "color": [0.4, 0.2, 0.1] 
+    },
+    "mass": 0.0,
+    "physics_material": { 
+      "friction": 0.5, 
+      "restitution": 0.9 
+    }
   },
   {
     "type": "box",
-    "position": [9, 2.7, 0.5],
-    "vertex": [0.15, 6, 1.5],
-    "material": { "color": [0.4, 0.2, 0.1] }
+    "name": "border_right",
+    "position": [15, 0, 0.5],
+    "vertex": [0.5, 20.5, 1.5],
+    "material": { 
+      "color": [0.4, 0.2, 0.1] 
+    },
+    "mass": 0.0,
+    "physics_material": { 
+      "friction": 0.5, 
+      "restitution": 0.9 
+    }
   },
   {
     "type": "box",
-    "position": [0, -3.3, 0.5],
-    "vertex": [9, 0.15, 1.5],
-    "material": { "color": [0.4, 0.2, 0.1] }
+    "name": "border_bottom",
+    "position": [0, -20, 0.5],
+    "vertex": [15.5, 0.5, 1.5],
+    "material": { 
+      "color": [0.4, 0.2, 0.1] 
+    },
+    "mass": 0.0,
+    "physics_material": { 
+      "friction": 0.5, 
+      "restitution": 0.9 
+    }
   },
   {
     "type": "box",
-    "position": [0, 8.7, 0.5],
-    "vertex": [9, 0.15, 1.5],
-    "material": { "color": [0.4, 0.2, 0.1] }
+    "name": "border_top",
+    "position": [0, 20, 0.5],
+    "vertex": [15.5, 0.5, 1.5],
+    "material": { 
+      "color": [0.4, 0.2, 0.1] 
+    },
+    "mass": 0.0,
+    "physics_material": { 
+      "friction": 0.5, 
+      "restitution": 0.9 
+    }
   }
 ]
