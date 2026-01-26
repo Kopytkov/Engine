@@ -2,7 +2,7 @@
     {
       "type": "sphere",
       "name": "ball_glass_test",
-      "position": [0.0, -1.97, 0.0],
+      "position": [0.0, -1.97, 1.35],
       "radius": 1.35,
       "material": {
         "color": [1.0, 1.0, 1.0],
@@ -16,7 +16,7 @@
     {
       "type": "sphere",
       "name": "ball_10_blue_stripe",
-      "position": [-1.35, 0.37, 0.0],
+      "position": [-1.35, 0.37, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.3, 0.3, 1.0],
@@ -31,7 +31,7 @@
     {
       "type": "sphere",
       "name": "ball_6_green_solid",
-      "position": [1.35, 0.37, 0.0],
+      "position": [1.35, 0.37, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.0, 0.5, 0.0],
@@ -46,7 +46,7 @@
     {
       "type": "sphere",
       "name": "ball_11_red_stripe",
-      "position": [-2.7, 2.71, 0.0],
+      "position": [-2.7, 2.71, 1.35],
       "radius": 1.35,
       "material": {
         "color": [1.0, 0.3, 0.3],
@@ -61,7 +61,7 @@
     {
       "type": "sphere",
       "name": "ball_8_black",
-      "position": [0.0, 2.71, 0.0],
+      "position": [0.0, 2.71, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.0, 0.0, 0.0],
@@ -76,7 +76,7 @@
     {
       "type": "sphere",
       "name": "ball_12_purple_stripe",
-      "position": [2.7, 2.71, 0.0],
+      "position": [2.7, 2.71, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.8, 0.4, 0.8],
@@ -91,7 +91,7 @@
     {
       "type": "sphere",
       "name": "ball_3_red_solid",
-      "position": [-4.05, 5.04, 0.0],
+      "position": [-4.05, 5.04, 1.35],
       "radius": 1.35,
       "material": {
         "color": [1.0, 0.0, 0.0],
@@ -106,7 +106,7 @@
     {
       "type": "sphere",
       "name": "ball_14_maroon_stripe",
-      "position": [-1.35, 5.04, 0.0],
+      "position": [-1.35, 5.04, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.7, 0.3, 0.3],
@@ -121,7 +121,7 @@
     {
       "type": "sphere",
       "name": "ball_5_orange_solid",
-      "position": [1.35, 5.04, 0.0],
+      "position": [1.35, 5.04, 1.35],
       "radius": 1.35,
       "material": {
         "color": [1.0, 0.65, 0.0],
@@ -136,7 +136,7 @@
     {
       "type": "sphere",
       "name": "ball_13_orange_stripe",
-      "position": [4.05, 5.04, 0.0],
+      "position": [4.05, 5.04, 1.35],
       "radius": 1.35,
       "material": {
         "color": [1.0, 0.8, 0.4],
@@ -151,7 +151,7 @@
     {
       "type": "sphere",
       "name": "ball_7_maroon_solid",
-      "position": [-5.4, 7.38, 0.0],
+      "position": [-5.4, 7.38, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.5, 0.0, 0.0],
@@ -166,7 +166,7 @@
     {
       "type": "sphere",
       "name": "ball_9_yellow_stripe",
-      "position": [-2.7, 7.38, 0.0],
+      "position": [-2.7, 7.38, 1.35],
       "radius": 1.35,
       "material": {
         "color": [1.0, 1.0, 0.5],
@@ -181,7 +181,7 @@
     {
       "type": "sphere",
       "name": "ball_4_purple_solid",
-      "position": [0.0, 7.38, 0.0],
+      "position": [0.0, 7.38, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.5, 0.0, 0.5],
@@ -196,7 +196,7 @@
     {
       "type": "sphere",
       "name": "ball_15_green_stripe",
-      "position": [2.7, 7.38, 0.0],
+      "position": [2.7, 7.38, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.4, 0.8, 0.4],
@@ -211,7 +211,7 @@
     {
       "type": "sphere",
       "name": "ball_2_blue_solid",
-      "position": [5.4, 7.38, 0.0],
+      "position": [5.4, 7.38, 1.35],
       "radius": 1.35,
       "material": {
         "color": [0.0, 0.0, 1.0],

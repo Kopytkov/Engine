@@ -32,6 +32,11 @@ add_executable(Engine
  src/gl/gl_renderer.cpp
  src/math/vec.h
  src/math/vec_functions.h
+ src/physics/physics_body.h
+ src/physics/physics_body.cpp
+ src/physics/physics_engine.h
+ src/physics/physics_engine.cpp
+ src/physics/physics_material.h
  src/render/app_utils.h
  src/render/app_utils.cpp
  src/render/camera.h
@@ -47,15 +52,13 @@ add_executable(Engine
  src/render/material.cpp
  src/render/object_parser.h
  src/render/object_parser.cpp
- src/render/physics_engine.h
- src/render/physics_engine.cpp
  src/render/ray.h
  src/render/ray.cpp
  src/render/raw_image.h
  src/render/raw_image.cpp
- src/render/render.h
  src/render/renderer.h
  src/render/renderer.cpp
+ src/render/scene_entity.h
  src/render/scene_loader.h
  src/render/scene_loader.cpp
  src/render/scene_object.h

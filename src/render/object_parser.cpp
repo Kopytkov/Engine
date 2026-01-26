@@ -2,7 +2,32 @@
 
 using json = nlohmann::json;
 
-std::unique_ptr<SceneObject> ObjectParser::Parse(const json& j) {
+// Вспомогательная функция для парсинга физического тела
+static std::unique_ptr<PhysicsBody> ParsePhysicsBody(const json& j,
+                                                     const vec3& initialPos) {
+  auto body = std::make_unique<PhysicsBody>();
+  body->SetPosition(initialPos);
+
+  if (j.contains("mass")) {
+    body->mass = j["mass"].get<float>();
+    if (body->mass <= 0.0f) {
+      body->isStatic = true;
+    }
+  }
+
+  if (j.contains("physics_material")) {
+    const auto& physMat = j["physics_material"];
+    if (physMat.contains("friction")) {
+      body->material->friction = physMat["friction"].get<float>();
+    }
+    if (physMat.contains("restitution")) {
+      body->material->restitution = physMat["restitution"].get<float>();
+    }
+  }
+  return body;
+}
+
+std::unique_ptr<SceneEntity> ObjectParser::Parse(const json& j) {
   if (!j.contains("type")) {
     throw std::runtime_error("Missing object.type");
   }
@@ -12,6 +37,8 @@ std::unique_ptr<SceneObject> ObjectParser::Parse(const json& j) {
 
   std::string type = j["type"].get<std::string>();
   vec3 pos = vec3(parseVec3(j["position"], "object.position"));
+
+  std::unique_ptr<SceneObject> sceneObject = nullptr;
 
   // Парсим sphere
   if (type == "sphere") {
@@ -27,11 +54,11 @@ std::unique_ptr<SceneObject> ObjectParser::Parse(const json& j) {
                        ? parseMaterial(j["material"])
                        : parseMaterial(json{{"type", "pbr"}});
 
-    return std::make_unique<Sphere>(pos, r, std::move(mat_ptr));
-  }
+    sceneObject = std::make_unique<Sphere>(pos, r, std::move(mat_ptr));
 
+  }
   // Парсим box
-  if (type == "box") {
+  else if (type == "box") {
     if (!j.contains("vertex")) {
       throw std::runtime_error("Missing object.vertex for box");
     }
@@ -42,8 +69,15 @@ std::unique_ptr<SceneObject> ObjectParser::Parse(const json& j) {
                        ? parseMaterial(j["material"])
                        : parseMaterial(json{{"type", "pbr"}});
 
-    return std::make_unique<Box>(pos, vertex, std::move(mat_ptr));
+    sceneObject = std::make_unique<Box>(pos, vertex, std::move(mat_ptr));
+  } else {
+    throw std::runtime_error("Unknown object type: " + type);
   }
 
-  throw std::runtime_error("Unknown object type: " + type);
+  // Создаем физическое тело
+  auto physicsBody = ParsePhysicsBody(j, pos);
+
+  // Собираем сущность
+  return std::make_unique<SceneEntity>(std::move(sceneObject),
+                                       std::move(physicsBody));
 }

@@ -5,7 +5,7 @@ Box::Box(const vec3& position,
          const vec3& vertex,
          std::unique_ptr<Material> mat)
     : vertex_(abs(vertex)), material_(std::move(mat)) {
-  PositionProperty::SetPosition(position);
+  SetPosition(position);
 }
 
 float Box::SDF(const vec3& point) const {
@@ -30,10 +30,14 @@ const Material& Box::GetMaterial() const {
 
 void Box::UpdateUniforms(Shader& shader) const {}
 
-vec3 Box::GetPosition() const {
-  return PositionProperty::GetPosition();
+void Box::SetRenderPosition(const vec3& position) {
+  SetPosition(position);
 }
 
-void Box::SetPosition(const vec3& position) {
-  PositionProperty::SetPosition(position);
+vec3 Box::GetRenderPosition() const {
+  return GetPosition();
+}
+
+vec3 Box::GetHalfExtents() const {
+  return vertex_;
 }

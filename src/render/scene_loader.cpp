@@ -69,11 +69,18 @@ SceneLoader SceneLoader::Load(const std::string& jsonPath) {
   if (resolved.contains("objects")) {
     const auto& objectsNode = resolved["objects"];
 
-    // Если objects — это массив с ref
+    // Вспомогательная лямбда для добавления объекта, чтобы не дублировать код
+    auto addObjectToScene = [&](const json& objJson) {
+      scene.AddEntity(ObjectParser::Parse(objJson));
+    };
+
+    // Логика обхода массива/объекта с учетом ref
     if (objectsNode.is_array()) {
       for (const auto& item : objectsNode) {
         json resolvedItem;
         if (item.is_object() && item.contains("ref")) {
+          std::string baseDir =
+              std::filesystem::path(jsonPath).parent_path().string();
           resolvedItem = resolveRef(item, baseDir);
         } else {
           resolvedItem = item;
@@ -82,28 +89,28 @@ SceneLoader SceneLoader::Load(const std::string& jsonPath) {
         // Теперь resolvedItem — либо массив объектов, либо один объект
         if (resolvedItem.is_array()) {
           for (const auto& obj : resolvedItem) {
-            scene.AddObject(ObjectParser::Parse(obj));
+            addObjectToScene(obj);
           }
         } else {
-          scene.AddObject(ObjectParser::Parse(resolvedItem));
+          addObjectToScene(resolvedItem);
         }
       }
     }
     // Если objects — один ref
     else if (objectsNode.is_object() && objectsNode.contains("ref")) {
+      std::string baseDir =
+          std::filesystem::path(jsonPath).parent_path().string();
       json included = resolveRef(objectsNode, baseDir);
       if (included.is_array()) {
         for (const auto& obj : included) {
-          scene.AddObject(ObjectParser::Parse(obj));
+          addObjectToScene(obj);
         }
       } else {
-        scene.AddObject(ObjectParser::Parse(included));
+        addObjectToScene(included);
       }
-    }
-    // Если objects — массив объектов
-    else if (objectsNode.is_array()) {
+    } else if (objectsNode.is_array()) {
       for (const auto& obj : objectsNode) {
-        scene.AddObject(ObjectParser::Parse(obj));
+        addObjectToScene(obj);
       }
     }
   }

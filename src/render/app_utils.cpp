@@ -17,12 +17,14 @@ bool AppUtils::InitRaymarchBallResources(
   outTextures.clear();
   outMaterials.clear();
 
-  // Собираем объекты-сферы
-  const auto& objects = scene.GetObjects();
+  // Собираем сферы
+  const auto& entities = scene.GetEntities();
   std::vector<const Sphere*> spheres;
-  for (const auto& obj : objects) {
-    if (auto* sphere = dynamic_cast<const Sphere*>(obj.get())) {
-      spheres.push_back(sphere);
+  for (const auto& entity : entities) {
+    if (entity->object) {
+      if (auto* sphere = dynamic_cast<const Sphere*>(entity->object.get())) {
+        spheres.push_back(sphere);
+      }
     }
   }
 

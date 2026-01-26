@@ -20,12 +20,12 @@ const Material& Sphere::GetMaterial() const {
 
 void Sphere::UpdateUniforms(Shader& shader) const {}
 
-vec3 Sphere::GetPosition() const {
-  return PositionProperty::GetPosition();
+void Sphere::SetRenderPosition(const vec3& position) {
+  SetPosition(position);
 }
 
-void Sphere::SetPosition(const vec3& position) {
-  PositionProperty::SetPosition(position);
+vec3 Sphere::GetRenderPosition() const {
+  return GetPosition();
 }
 
 float Sphere::GetRadius() const {

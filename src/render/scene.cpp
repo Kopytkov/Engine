@@ -1,5 +1,5 @@
 #include "scene.h"
-#include "physics_engine.h"
+#include "physics/physics_engine.h"
 
 Scene::Scene() {
   physics_engine_ = std::make_unique<PhysicsEngine>();
@@ -10,8 +10,8 @@ Scene::~Scene() = default;
 Scene::Scene(Scene&&) = default;
 Scene& Scene::operator=(Scene&&) = default;
 
-void Scene::AddObject(std::unique_ptr<SceneObject> object) {
-  objects_.push_back(std::move(object));
+void Scene::AddEntity(std::unique_ptr<SceneEntity> entity) {
+  entities_.push_back(std::move(entity));
 }
 
 void Scene::AddLight(std::unique_ptr<LightSource> light) {
@@ -19,21 +19,28 @@ void Scene::AddLight(std::unique_ptr<LightSource> light) {
 }
 
 void Scene::UpdatePhysics(float deltaTime) {
-  // Обрабатываем столкновения
+  // Интеграция: обновляем физические тела
+  for (auto& entity : entities_) {
+    if (entity->body) {
+      entity->body->IntegrateState(deltaTime);
+    }
+  }
+
+  // Обработка столкновений
   if (physics_engine_) {
     physics_engine_->ProcessCollisions(*this, deltaTime);
   }
 
-  // Обновляем позиции
-  for (const auto& obj : objects_) {
-    if (obj) {
-      obj->IntegrateState(deltaTime);
+  // Синхронизация позиций графических объектов с физическими телами
+  for (auto& entity : entities_) {
+    if (entity->body && entity->object) {
+      entity->object->SetRenderPosition(entity->body->GetPosition());
     }
   }
 }
 
-const std::vector<std::unique_ptr<SceneObject>>& Scene::GetObjects() const {
-  return objects_;
+const std::vector<std::unique_ptr<SceneEntity>>& Scene::GetEntities() const {
+  return entities_;
 }
 
 const std::vector<std::unique_ptr<LightSource>>& Scene::GetLights() const {
@@ -94,14 +101,16 @@ std::tuple<float, SceneObject*> Scene::GetDistance(const vec3& position,
                                                    SceneObject* ignore) const {
   float result = kMaxDistance;
   SceneObject* nearest = nullptr;
-  for (const auto& obj : objects_) {
-    if (obj.get() == ignore) {
+  for (const auto& entity : entities_) {
+    SceneObject* obj = entity->object.get();
+    if (!obj || obj == ignore) {
       continue;
     }
+
     float d = std::abs(obj->SDF(position));
     if (d < result) {
       result = d;
-      nearest = obj.get();
+      nearest = obj;
     }
   }
   return {result, nearest};
