@@ -75,10 +75,16 @@ void GLRenderer::UpdateUniforms(const Scene& scene, Shader& shader) {
 
   // Собираем массив позиций для шаров
   std::vector<vec3> ballPositions;
+  std::vector<mat3<float>> ballRotations;
   for (const auto& entity : entities) {
     if (entity->object) {
       if (auto* sphere = dynamic_cast<Sphere*>(entity->object.get())) {
         ballPositions.push_back(sphere->GetRenderPosition());
+        quat q;
+        if (entity->body) {
+          q = entity->body->orientation;
+        }
+        ballRotations.push_back(quatToMat3(q));
       }
     }
   }
@@ -93,6 +99,15 @@ void GLRenderer::UpdateUniforms(const Scene& scene, Shader& shader) {
   for (int i = 0; i < count; ++i) {
     std::string idx = "[" + std::to_string(i) + "]";
     shader.setVec3("ballPositions" + idx, ballPositions[i]);
+    mat3<float> R = ballRotations[i];
+    float flatMat[9] = {
+        R[0][0], R[0][1], R[0][2],  // 1-я строка
+        R[1][0], R[1][1], R[1][2],  // 2-я строка
+        R[2][0], R[2][1], R[2][2]   // 3-я строка
+    };
+
+    // Передаем как матрицу
+    shader.setMat3("ballRotations" + idx, flatMat);
   }
 
   // Обновляем количество

@@ -41,6 +41,7 @@ uniform BallMaterial ballMaterials[16];
 
 // Динамические параметры
 uniform vec3 ballPositions[16];
+uniform mat3 ballRotations[16]; 
 uniform int ballCount;
 uniform float ballRadius;
 
@@ -119,9 +120,17 @@ vec3 calcNormal(vec3 p, int hitType, int ballIndex) {
 }
 
 // UV развертка
-vec2 sphereUV(vec3 normal) {
-    float u = 0.75 - atan(normal.z, normal.x) / (2.0 * 3.14159265);
-    float v = 0.5 + asin(normal.y) / 3.14159265;
+vec2 sphereUV(vec3 normal, int ballIndex) {
+    vec3 localNormal = normal;
+    
+    // Если передан корректный индекс шара, вращаем нормаль
+    if (ballIndex >= 0) {
+        // Умножаем на матрицу, чтобы перевести нормаль из мирового пр-ва в локальное
+        localNormal = ballRotations[ballIndex] * normal;
+    }
+
+    float u = 0.75 - atan(localNormal.z, localNormal.x) / (2.0 * 3.14159265);
+    float v = 0.5 + asin(localNormal.y) / 3.14159265;
     u -= floor(u);
     // Масштабируем текстуру, чтобы номер был крупнее
     return clamp(vec2(0.5) + (vec2(u, v) - 0.5) * 3.0, 0.0, 1.0);
@@ -197,7 +206,7 @@ vec3 rayMarch(vec3 ro, vec3 rd) {
             } else {                 // Шары
                 mat = ballMaterials[ballIndex];
                 if (mat.textureID >= 0) {
-                    mat.baseColor = texture(ballTextures[mat.textureID], sphereUV(hitNormal)).rgb;
+                    mat.baseColor = texture(ballTextures[mat.textureID], sphereUV(hitNormal, ballIndex)).rgb;
                 }
             }
 

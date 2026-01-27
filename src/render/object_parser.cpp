@@ -9,10 +9,16 @@ static std::unique_ptr<PhysicsBody> ParsePhysicsBody(const json& j,
   body->SetPosition(initialPos);
 
   if (j.contains("mass")) {
-    body->mass = j["mass"].get<float>();
-    if (body->mass <= 0.0f) {
-      body->isStatic = true;
-    }
+    float m = j["mass"].get<float>();
+    body->SetMass(m);
+  }
+
+  // Добавляем парсинг затухания (для будущего)
+  if (j.contains("linear_damping")) {
+    body->linearDamping = j["linear_damping"].get<float>();
+  }
+  if (j.contains("angular_damping")) {
+    body->angularDamping = j["angular_damping"].get<float>();
   }
 
   if (j.contains("physics_material")) {
@@ -40,6 +46,10 @@ std::unique_ptr<SceneEntity> ObjectParser::Parse(const json& j) {
 
   std::unique_ptr<SceneObject> sceneObject = nullptr;
 
+  // Переменные для хранения размеров, чтобы передать их в физику
+  float sphereRadius = 0.0f;
+  vec3 boxHalfExtents{0.0f};
+
   // Парсим sphere
   if (type == "sphere") {
     if (!j.contains("radius")) {
@@ -49,6 +59,7 @@ std::unique_ptr<SceneEntity> ObjectParser::Parse(const json& j) {
     if (r <= 0) {
       throw std::runtime_error("Invalid radius");
     }
+    sphereRadius = r;
 
     auto mat_ptr = j.contains("material")
                        ? parseMaterial(j["material"])
@@ -64,6 +75,7 @@ std::unique_ptr<SceneEntity> ObjectParser::Parse(const json& j) {
     }
 
     vec3 vertex = vec3(parseVec3(j["vertex"], "object.vertex"));
+    boxHalfExtents = vertex;
 
     auto mat_ptr = j.contains("material")
                        ? parseMaterial(j["material"])
@@ -76,6 +88,15 @@ std::unique_ptr<SceneEntity> ObjectParser::Parse(const json& j) {
 
   // Создаем физическое тело
   auto physicsBody = ParsePhysicsBody(j, pos);
+
+  // Если тело динамическое (mass > 0), настраиваем тензор инерции
+  if (!physicsBody->isStatic) {
+    if (type == "sphere") {
+      physicsBody->SetInertiaSphere(sphereRadius);
+    } else if (type == "box") {
+      physicsBody->SetInertiaBox(boxHalfExtents);
+    }
+  }
 
   // Собираем сущность
   return std::make_unique<SceneEntity>(std::move(sceneObject),

@@ -171,6 +171,23 @@ inline float saturate(float x) {
   return std::max(0.0f, std::min(1.0f, x));
 }
 
+// Умножение Матрицы на Вектор
+inline vec3 MulMatVec(const mat3<float>& m, const vec3& v) {
+  return vec3(dot(m[0], v),  // Строка 0 * v
+              dot(m[1], v),  // Строка 1 * v
+              dot(m[2], v)   // Строка 2 * v
+  );
+}
+
+// Умножение Транспонированной Матрицы на Вектор
+inline vec3 MulMatTransposedVec(const mat3<float>& m, const vec3& v) {
+  return vec3(
+      m[0][0] * v[0] + m[1][0] * v[1] + m[2][0] * v[2],  // Столбец 0 * v
+      m[0][1] * v[0] + m[1][1] * v[1] + m[2][1] * v[2],  // Столбец 1 * v
+      m[0][2] * v[0] + m[1][2] * v[1] + m[2][2] * v[2]   // Столбец 2 * v
+  );
+}
+
 inline vec3 RGBtoVec3(const RGB& c) {
   return vec3(static_cast<float>(c.r) / 255.0f,
               static_cast<float>(c.g) / 255.0f,
@@ -203,4 +220,54 @@ inline vec3 acesTonemap(vec3 color) {
   const float e = 0.14f;
   return clamp((color * (a * color + b)) / (color * (c * color + d) + e), 0.0f,
                1.0f);
+}
+
+// Нормализация кватерниона
+inline quat normalize(const quat& q) {
+  float len = std::sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+  if (len < 1e-6f) {
+    return quat(1, 0, 0, 0);
+  }
+  float inv = 1.0f / len;
+  return quat(q.w * inv, q.x * inv, q.y * inv, q.z * inv);
+}
+
+// Умножение кватернионов
+inline quat operator*(const quat& q1, const quat& q2) {
+  return quat(q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z,
+              q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y,
+              q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x,
+              q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w);
+}
+
+// Умножение кватерниона на скаляр
+inline quat operator*(const quat& q, float s) {
+  return quat(q.w * s, q.x * s, q.y * s, q.z * s);
+}
+
+// Сложение кватернионов
+inline quat operator+(const quat& a, const quat& b) {
+  return quat(a.w + b.w, a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+// Конвертация Кватерниона в Матрицу 3x3
+inline mat3<float> quatToMat3(const quat& q) {
+  mat3<float> m;
+  float x2 = q.x + q.x;
+  float y2 = q.y + q.y;
+  float z2 = q.z + q.z;
+  float xx = q.x * x2;
+  float xy = q.x * y2;
+  float xz = q.x * z2;
+  float yy = q.y * y2;
+  float yz = q.y * z2;
+  float zz = q.z * z2;
+  float wx = q.w * x2;
+  float wy = q.w * y2;
+  float wz = q.w * z2;
+
+  m[0] = vec3(1.0f - (yy + zz), xy - wz, xz + wy);
+  m[1] = vec3(xy + wz, 1.0f - (xx + zz), yz - wx);
+  m[2] = vec3(xz - wy, yz + wx, 1.0f - (xx + yy));
+  return m;
 }

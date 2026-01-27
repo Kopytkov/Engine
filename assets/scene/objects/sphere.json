@@ -11,6 +11,10 @@
         "refraction": 1.5,
         "roughness": 0.05,
         "metallic": 0.0
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -26,6 +30,10 @@
         "roughness": 0.27,
         "metallic": 0.0,
         "texture":"assets/textures/ball_10_blue_stripe.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -41,6 +49,10 @@
         "roughness": 0.17,
         "metallic": 0.0,
         "texture":"assets/textures/ball_6_green_solid.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -56,6 +68,10 @@
         "roughness": 0.25,
         "metallic": 0.0,
         "texture":"assets/textures/ball_11_red_stripe.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -71,6 +87,10 @@
         "roughness": 0.41,
         "metallic": 0.0,
         "texture":"assets/textures/ball_8_black.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -86,6 +106,10 @@
         "roughness": 0.23,
         "metallic": 0.0,
         "texture":"assets/textures/ball_12_purple_stripe.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -101,6 +125,10 @@
         "roughness": 0.16,
         "metallic": 0.0,
         "texture": "assets/textures/ball_3_red_solid.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -116,6 +144,10 @@
         "roughness": 0.30,
         "metallic": 0.0,
         "texture":"assets/textures/ball_14_maroon_stripe.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -131,6 +163,10 @@
         "roughness": 0.17,
         "metallic": 0.0,
         "texture":"assets/textures/ball_5_orange_solid.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -146,6 +182,10 @@
         "roughness": 0.22,
         "metallic": 0.0,
         "texture":"assets/textures/ball_13_orange_stripe.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -161,6 +201,10 @@
         "roughness": 0.19,
         "metallic": 0.0,
         "texture":"assets/textures/ball_7_maroon_solid.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -176,6 +220,10 @@
         "roughness": 0.21,
         "metallic": 0.0,
         "texture":"assets/textures/ball_9_yellow_stripe.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -191,6 +239,10 @@
         "roughness": 0.16,
         "metallic": 0.0,
         "texture":"assets/textures/ball_4_purple_solid.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -206,6 +258,10 @@
         "roughness": 0.34,
         "metallic": 0.0,
         "texture":"assets/textures/ball_15_green_stripe.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     },
     {
@@ -221,6 +277,10 @@
         "roughness": 0.15,
         "metallic": 0.0,
         "texture": "assets/textures/ball_2_blue_solid.bmp"
+      },
+      "physics_material": {
+          "friction": 0.05,
+          "restitution": 0.92
       }
     }
 ]

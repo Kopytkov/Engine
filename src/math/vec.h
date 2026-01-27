@@ -69,6 +69,28 @@ class vec {
   T& operator[](int i) { return data[i]; }
 };
 
+// 3x3 Матрица
+template <typename T>
+struct mat3 {
+  vec<T, 3> rows[3];
+
+  mat3() {
+    rows[0] = vec<T, 3>(1, 0, 0);
+    rows[1] = vec<T, 3>(0, 1, 0);
+    rows[2] = vec<T, 3>(0, 0, 1);
+  }
+
+  const vec<T, 3>& operator[](int i) const { return rows[i]; }
+  vec<T, 3>& operator[](int i) { return rows[i]; }
+};
+
+// Кватернион
+struct quat {
+  float w, x, y, z;
+  quat() : w(1.0f), x(0.0f), y(0.0f), z(0.0f) {}
+  quat(float _w, float _x, float _y, float _z) : w(_w), x(_x), y(_y), z(_z) {}
+};
+
 template <typename T, int N>
 vec<T, N> operator+(const vec<T, N>& v1, const vec<T, N>& v2) {
   vec<T, N> res;

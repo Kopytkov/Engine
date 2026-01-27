@@ -69,28 +69,32 @@ void Shader::use() const {
 
 // Устанавливает значение uniform-переменной типа int
 void Shader::setInt(const std::string& name, int value) const {
-  glUniform1i(glGetUniformLocation(programID, name.c_str()), value);
+  glUniform1i(getUniformLocation(name), value);
 }
 
 // Устанавливает значение uniform-переменной типа float
 void Shader::setFloat(const std::string& name, float value) const {
-  glUniform1f(glGetUniformLocation(programID, name.c_str()), value);
+  glUniform1f(getUniformLocation(name), value);
 }
 
 // Устанавливает uniform типа vec2 (два float)
 void Shader::setVec2(const std::string& name, float x, float y) const {
-  glUniform2f(glGetUniformLocation(programID, name.c_str()), x, y);
+  glUniform2f(getUniformLocation(name), x, y);
 }
 
 // Устанавливает uniform типа vec3 (три float)
 void Shader::setVec3(const std::string& name, float x, float y, float z) const {
-  glUniform3f(glGetUniformLocation(programID, name.c_str()), x, y, z);
+  glUniform3f(getUniformLocation(name), x, y, z);
 }
 
 // Перегрузка для передачи vec3 напрямую из структуры
 void Shader::setVec3(const std::string& name, const vec3& value) const {
-  glUniform3f(glGetUniformLocation(programID, name.c_str()), value[0], value[1],
-              value[2]);
+  glUniform3f(getUniformLocation(name), value[0], value[1], value[2]);
+}
+
+// Перегрузка для передачи mat3 напрямую из структуры
+void Shader::setMat3(const std::string& name, const float* mat_data) const {
+  glUniformMatrix3fv(getUniformLocation(name), 1, GL_TRUE, mat_data);
 }
 
 std::string Shader::readFile(const std::string& path) {
@@ -130,4 +134,13 @@ GLuint Shader::compileShader(const std::string& source, GLenum type) {
     return 0;
   }
   return shader;
+}
+
+GLint Shader::getUniformLocation(const std::string& name) const {
+  if (uniformLocationCache.find(name) != uniformLocationCache.end()) {
+    return uniformLocationCache[name];
+  }
+  GLint location = glGetUniformLocation(programID, name.c_str());
+  uniformLocationCache[name] = location;
+  return location;
 }
