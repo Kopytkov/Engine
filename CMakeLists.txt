@@ -26,10 +26,18 @@ add_executable(Engine
  src/main.cpp
  src/bmp/bmp.h
  src/bmp/bmp.cpp
+ src/control/camera_controller.h
+ src/control/camera_controller.cpp
+ src/control/controller.h
+ src/control/controller.cpp
+ src/control/property.h
+ src/control/property.cpp
  src/gl/shader.h
  src/gl/shader.cpp
  src/gl/gl_renderer.h
  src/gl/gl_renderer.cpp
+ src/input/input_controller.h
+ src/input/input_controller.cpp
  src/math/vec.h
  src/math/vec_functions.h
  src/physics/physics_body.h
@@ -83,10 +91,6 @@ add_executable(Engine
  src/render/RGB.cpp
  src/render/scene_object_box.h
  src/render/scene_object_box.cpp
- src/control/property.h
- src/control/property.cpp
- src/control/controller.h
- src/control/controller.cpp
  )
 target_link_libraries(Engine 
     PRIVATE 

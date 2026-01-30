@@ -3,12 +3,12 @@
 #include <iostream>
 #include <sstream>
 
+#include "control/camera_controller.h"
 #include "gl/gl_renderer.h"
 #include "gl/shader.h"
+#include "input/input_controller.h"
 #include "render/app_utils.h"
 #include "render/camera.h"
-#include "render/raw_image.h"
-#include "render/scene_entity.h"
 #include "render/scene_loader.h"
 #include "render/texture.h"
 #include "render/texture_manager.h"
@@ -60,15 +60,17 @@ int main(int argc, char* argv[]) {
 
   // const auto& entities = scene.GetEntities();
 
-  // // Тест на проверку столкновения шаров
+  // // Тест на проверку гравитации и коллизии со столом
   // if (entities.size() >= 2) {
   //   auto& ball_1 = entities[0];
-  //   auto& ball_2 = entities[1];
 
-  //   if (ball_1->body && ball_2->body) {
-  //     // Задаем скорости шарам навстречу друг другу
-  //     ball_1->body->SetVelocity(vec3(0.0f, 10.0f, 0.0f));   // летит вверх
-  //     ball_2->body->SetVelocity(vec3(0.0f, -10.0f, 0.0f));  // летит вниз
+  //   if (ball_1->body) {
+  //     // Поднимаем шар над столом (Z = 20.0)
+  //     ball_1->body->SetPosition(vec3(0.0f, 0.0f, 20.0f));
+  //     ball_1->body->SetVelocity(vec3(0.0f, 0.0f, 0.0f));
+
+  //     // Слегка толкнем его вбок, чтобы он покатился после падения
+  //     ball_1->body->ApplyForce(vec3(0.0f, 200.0f, 0.0f));
   //   }
   // }
 
@@ -79,6 +81,13 @@ int main(int argc, char* argv[]) {
     return -1;
   }
   Camera camera = *camera_opt;
+
+  // Настройка контроллера камеры и ввода
+  InputController input;
+  input.Initialize();
+
+  CameraController camController(camera, input);
+  camController.SetSpeed(3.0f, 90.0f);
 
   // Пустая 1x1 текстура — используется как заглушка
   RawImage dummy(1, 1);
@@ -98,9 +107,6 @@ int main(int argc, char* argv[]) {
   // Привязываем текстуры шаров
   AppUtils::BindBallTextures(g_ballTextures, raymarchShader);
 
-  // Основной цикл приложения
-  bool running = true;
-
   // Логика фиксированного шага времени
   float timeAccumulator = 0.0f;  // Накапливает время кадра
   const int PHYSICS_UPDATES_PER_SECOND = 60;
@@ -113,10 +119,8 @@ int main(int argc, char* argv[]) {
   float smoothFPS = 60.0f;
   float currentFPS = 0.0f;
 
-  const float moveSpeed = 3.0f;
-  const float rotateSpeed = 90.0f;
-
-  SDL_SetRelativeMouseMode(SDL_TRUE);
+  // Основной цикл приложения
+  bool running = true;
 
   while (running) {
     Uint32 now = SDL_GetTicks();
@@ -139,46 +143,11 @@ int main(int argc, char* argv[]) {
     }
 
     // Обработка событий
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
-        running = false;
-      }
-    }
-
-    // Обработка клавиатурного ввода
-    const Uint8* keys = SDL_GetKeyboardState(nullptr);
-
-    if (keys[SDL_SCANCODE_W]) {
-      camera.Move(camera.GetUpVec() * moveSpeed * frameTime);
-    }
-    if (keys[SDL_SCANCODE_S]) {
-      camera.Move(-camera.GetUpVec() * moveSpeed * frameTime);
-    }
-    if (keys[SDL_SCANCODE_A]) {
-      vec3 left = normalize(cross(camera.GetUpVec(), camera.GetViewVec()));
-      camera.Move(left * moveSpeed * frameTime);
-    }
-    if (keys[SDL_SCANCODE_D]) {
-      vec3 right = normalize(cross(camera.GetViewVec(), camera.GetUpVec()));
-      camera.Move(right * moveSpeed * frameTime);
-    }
-    if (keys[SDL_SCANCODE_SPACE]) {
-      camera.Move(camera.GetViewVec() * moveSpeed * frameTime);
-    }
-    if (keys[SDL_SCANCODE_LCTRL]) {
-      camera.Move(-camera.GetViewVec() * moveSpeed * frameTime);
-    }
-    if (keys[SDL_SCANCODE_ESCAPE]) {
+    input.PollEvents();
+    if (input.ShouldClose()) {
       running = false;
     }
-
-    // Поворот камеры по движению мыши
-    int mx, my;
-    if (SDL_GetRelativeMouseState(&mx, &my) && (mx || my)) {
-      camera.Rotate(static_cast<float>(mx) * rotateSpeed * frameTime,
-                    -static_cast<float>(my) * rotateSpeed * frameTime);
-    }
+    camController.HandleInput(frameTime);
 
     // Цикл обновления физики
     while (timeAccumulator >= fixedDeltaTime) {
