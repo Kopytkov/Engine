@@ -19,16 +19,9 @@ void Scene::AddLight(std::unique_ptr<LightSource> light) {
 }
 
 void Scene::UpdatePhysics(float deltaTime) {
-  // Интеграция: обновляем физические тела
-  for (auto& entity : entities_) {
-    if (entity->body) {
-      entity->body->IntegrateState(deltaTime);
-    }
-  }
-
   // Обработка столкновений
   if (physics_engine_) {
-    physics_engine_->ProcessCollisions(*this, deltaTime);
+    physics_engine_->Update(*this, deltaTime);
   }
 
   // Синхронизация позиций графических объектов с физическими телами

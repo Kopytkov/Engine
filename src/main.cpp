@@ -60,15 +60,17 @@ int main(int argc, char* argv[]) {
 
   // const auto& entities = scene.GetEntities();
 
-  // // Тест на проверку столкновения шаров
+  // // Тест на проверку гравитации и коллизии со столом
   // if (entities.size() >= 2) {
   //   auto& ball_1 = entities[0];
-  //   auto& ball_2 = entities[1];
 
-  //   if (ball_1->body && ball_2->body) {
-  //     // Задаем скорости шарам навстречу друг другу
-  //     ball_1->body->SetVelocity(vec3(0.0f, 10.0f, 0.0f));   // летит вверх
-  //     ball_2->body->SetVelocity(vec3(0.0f, -10.0f, 0.0f));  // летит вниз
+  //   if (ball_1->body) {
+  //     // Поднимаем шар над столом (Z = 20.0)
+  //     ball_1->body->SetPosition(vec3(0.0f, 0.0f, 20.0f));
+  //     ball_1->body->SetVelocity(vec3(0.0f, 0.0f, 0.0f));
+
+  //     // Слегка толкнем его вбок, чтобы он покатился после падения
+  //     ball_1->body->ApplyForce(vec3(0.0f, 200.0f, 0.0f));
   //   }
   // }
 
