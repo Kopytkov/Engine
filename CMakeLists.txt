@@ -32,6 +32,8 @@ add_executable(Engine
  src/control/controller.cpp
  src/control/property.h
  src/control/property.cpp
+ src/core/application.h
+ src/core/application.cpp
  src/gl/shader.h
  src/gl/shader.cpp
  src/gl/gl_renderer.h
