@@ -2,95 +2,11 @@
 #include <algorithm>
 #include <cmath>
 #include "math/vec_functions.h"
-#include "render/scene_object_box.h"
-#include "render/scene_object_sphere.h"
 
 constexpr float kFrictionThreshold =
     1e-4f;  // Порог касательной скорости для трения
 constexpr float kRestingVelocityThreshold =
     0.05f;  // Порог нормальной скорости для "залипания"
-constexpr float kEpsilon =
-    1e-6f;  // Минимальная дистанция для предотвращения деления на ноль
-
-// Вспомогательная структура для данных о столкновении
-struct CollisionManifold {
-  bool isColliding = false;
-  vec3 normal{0.0f};        // Нормаль столкновения
-  float depth = 0.0f;       // Глубина проникновения
-  vec3 contactPoint{0.0f};  // Точка контакта на поверхности
-};
-
-CollisionManifold DetectCollisionSphereSphere(const Sphere* a,
-                                              const PhysicsBody* bodyA,
-                                              const Sphere* b,
-                                              const PhysicsBody* bodyB) {
-  CollisionManifold result;
-  vec3 posA = bodyA->GetPosition();
-  vec3 posB = bodyB->GetPosition();
-  vec3 delta = posA - posB;
-  float dist = length(delta);
-  float radiusSum = a->GetRadius() + b->GetRadius();
-
-  if (dist < radiusSum) {
-    result.isColliding = true;
-    result.depth = radiusSum - dist;
-    // Если центры совпадают, выбираем произвольную ось Y
-    result.normal = (dist > 1e-6f) ? normalize(delta) : vec3(0, 1, 0);
-
-    // Точка контакта лежит посередине между поверхностями (упрощенно)
-    result.contactPoint = posA - result.normal * a->GetRadius();
-  }
-  return result;
-}
-
-CollisionManifold DetectCollisionSphereBox(const Sphere* sphere,
-                                           const PhysicsBody* bodySphere,
-                                           const Box* box,
-                                           const PhysicsBody* bodyBox) {
-  CollisionManifold result;
-
-  vec3 spherePos = bodySphere->GetPosition();
-  vec3 boxPos = bodyBox->GetPosition();
-
-  // Получаем матрицу поворота коробки
-  mat3<float> boxRot = quatToMat3(bodyBox->orientation);
-
-  // Переводим сферу в локальную систему координат коробки
-  vec3 relPos = spherePos - boxPos;
-  vec3 localSpherePos = MulMatTransposedVec(boxRot, relPos);
-
-  // Находим ближайшую точку на поверхности коробки к центру сферы
-  vec3 boxHalfExtents = box->GetHalfExtents();
-  vec3 closestPointLocal = vec3(
-      std::clamp(localSpherePos[0], -boxHalfExtents[0], boxHalfExtents[0]),
-      std::clamp(localSpherePos[1], -boxHalfExtents[1], boxHalfExtents[1]),
-      std::clamp(localSpherePos[2], -boxHalfExtents[2], boxHalfExtents[2]));
-
-  // Проверяем расстояние от ближайшей точки до центра сферы
-  vec3 differenceLocal = localSpherePos - closestPointLocal;
-  float distance = length(differenceLocal);
-  float radius = sphere->GetRadius();
-
-  if (distance < radius) {
-    result.isColliding = true;
-    result.depth = radius - distance;
-
-    // Вычисляем нормаль в локальном пространстве
-    vec3 normalLocal;
-    if (distance < kEpsilon) {
-      // Сфера внутри - берем вектор до центра
-      normalLocal = normalize(localSpherePos);
-    } else {
-      normalLocal = normalize(differenceLocal);
-    }
-
-    // Переводим результат обратно в мировые координаты
-    result.normal = MulMatVec(boxRot, normalLocal);
-    result.contactPoint = boxPos + MulMatVec(boxRot, closestPointLocal);
-  }
-
-  return result;
-}
 
 void ResolveCollision(PhysicsBody* bodyA,
                       PhysicsBody* bodyB,
@@ -247,38 +163,16 @@ void PhysicsEngine::ProcessCollisions(Scene& scene, float deltaTime) {
       auto* entA = entities[i].get();
       auto* entB = entities[j].get();
 
-      // Пропускаем, если у кого-то нет физики
       if (!entA->body || !entB->body) {
         continue;
       }
 
-      // Пропускаем, если оба статичны
       if (entA->body->isStatic && entB->body->isStatic) {
         continue;
       }
 
-      CollisionManifold manifold;
-      auto* sphereA = dynamic_cast<Sphere*>(entA->object.get());
-      auto* sphereB = dynamic_cast<Sphere*>(entB->object.get());
-      auto* boxA = dynamic_cast<Box*>(entA->object.get());
-      auto* boxB = dynamic_cast<Box*>(entB->object.get());
-
-      // Sphere vs Sphere
-      if (sphereA && sphereB) {
-        manifold = DetectCollisionSphereSphere(sphereA, entA->body.get(),
-                                               sphereB, entB->body.get());
-      }
-      // Sphere vs Box
-      else if (sphereA && boxB) {
-        manifold = DetectCollisionSphereBox(sphereA, entA->body.get(), boxB,
-                                            entB->body.get());
-      }
-      // Box vs Sphere (зеркально)
-      else if (boxA && sphereB) {
-        manifold = DetectCollisionSphereBox(sphereB, entB->body.get(), boxA,
-                                            entA->body.get());
-        manifold.normal = -manifold.normal;  // Инвертируем нормаль
-      }
+      CollisionManifold manifold = entA->object->ComputeCollision(
+          entB->object.get(), entA->body.get(), entB->body.get());
 
       if (manifold.isColliding) {
         ResolveCollision(entA->body.get(), entB->body.get(), manifold);

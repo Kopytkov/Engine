@@ -15,6 +15,24 @@ class Sphere : public SceneObject, public PositionProperty {
 
   float GetRadius() const;
 
+  // Главный метод входа
+  CollisionManifold ComputeCollision(
+      const SceneObject* other,
+      const PhysicsBody* myBody,
+      const PhysicsBody* otherBody) const override;
+
+  // Визитор для Sphere
+  CollisionManifold ComputeCollisionWith(
+      const Sphere* otherSphere,
+      const PhysicsBody* myBody,
+      const PhysicsBody* otherBody) const override;
+
+  // Визитор для Box
+  CollisionManifold ComputeCollisionWith(
+      const Box* otherBox,
+      const PhysicsBody* myBody,
+      const PhysicsBody* otherBody) const override;
+
  private:
   float radius_;
   std::unique_ptr<Material> material_;

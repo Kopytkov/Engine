@@ -59,10 +59,12 @@ bool Application::Initialize() {
   // const auto& entities = scene.GetEntities();
   // if (entities.size() >= 2) {
   //   auto& ball_1 = entities[0];
+  //   auto& ball_2 = entities[3];
   //   if (ball_1->object) {
   //     // Поднимаем шар над столом (Z = 20.0)
   //     ball_1->body->SetPosition(vec3(0.0f, 0.0f, 20.0f));
   //     ball_1->body->SetVelocity(vec3(0.0f, 0.0f, 0.0f));
+  //     ball_2->body->SetVelocity(vec3(0.0f, 10.0f, 0.0f));
   //     // Слегка толкнем его вбок, чтобы он покатился после падения
   //     ball_1->body->ApplyForce(vec3(0.0f, 200.0f, 0.0f));
   //   }
