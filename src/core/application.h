@@ -10,7 +10,6 @@
 #include "gl/gl_renderer.h"
 #include "gl/shader.h"
 #include "input/input_controller.h"
-#include "render/app_utils.h"
 #include "render/camera.h"
 #include "render/scene_loader.h"
 #include "render/texture.h"
@@ -50,8 +49,6 @@ class Application {
 
   // Шейдеры и текстуры
   std::optional<Shader> raymarchShader_;
-  std::vector<Texture> ballTextures_;
-  std::vector<BallMaterialGPU> ballMaterialsGPU_;
   std::unique_ptr<Texture> dummyTexture_;
 
   // Данные для цикла и физики

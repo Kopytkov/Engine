@@ -31,6 +31,7 @@ uniform float globalLightBrightness;
 
 uniform sampler2D ballTextures[16];
 
+// UBO BLOCK (std140)
 struct BallMaterial {
   vec3 baseColor;
   float roughness;
@@ -39,13 +40,18 @@ struct BallMaterial {
   float refraction;
   int textureID;
 };
-uniform BallMaterial ballMaterials[16];
 
-// Динамические параметры
-uniform vec3 ballPositions[16];
-uniform mat3 ballRotations[16];
-uniform int ballCount;
-uniform float ballRadius;
+struct BallData {
+  vec3 position;
+  mat3 rotation;
+  BallMaterial material;
+};
+
+layout(std140) uniform BallBlock {
+  float ballRadius;
+  int ballCount;
+  BallData balls[16];
+};
 
 // SDF функции
 float sdSphere(vec3 p, vec3 center, float radius) {
@@ -99,11 +105,11 @@ float sceneSDF(vec3 p,
   for (int i = 0; i < ballCount; ++i) {
     // Если это расчет тени, мы игнорируем прозрачные шары, чтобы свет проходил
     // сквозь них
-    if (ignoreTransparent && ballMaterials[i].transmission > 0.5) {
+    if (ignoreTransparent && balls[i].material.transmission > 0.5) {
       continue;
     }
 
-    float ball = sdSphere(p, ballPositions[i], ballRadius);
+    float ball = sdSphere(p, balls[i].position, ballRadius);
     if (ball < min_dist) {
       min_dist = ball;
       hitType = 3;
@@ -117,7 +123,7 @@ float sceneSDF(vec3 p,
 vec3 calcNormal(vec3 p, int hitType, int ballIndex) {
   // Для сфер используем идеально точную математическую нормаль
   if (hitType == 3 && ballIndex >= 0) {
-    return normalize(p - ballPositions[ballIndex]);
+    return normalize(p - balls[ballIndex].position);
   }
   // Для стола нормаль всегда смотрит строго вверх
   if (hitType == 1) {
@@ -141,7 +147,7 @@ vec2 sphereUV(vec3 normal, int ballIndex) {
   if (ballIndex >= 0) {
     // Умножаем на матрицу, чтобы перевести нормаль из мирового пр-ва в
     // локальное
-    localNormal = normal * ballRotations[ballIndex];
+    localNormal = normal * balls[ballIndex].rotation;
   }
 
   float u = 0.75 - atan(localNormal.z, localNormal.x) / (2.0 * 3.14159265);
@@ -225,7 +231,7 @@ vec3 rayMarch(vec3 ro, vec3 rd) {
         mat.transmission = 0.0;
         mat.metallic = 0.0;
       } else {  // Шары
-        mat = ballMaterials[ballIndex];
+        mat = balls[ballIndex].material;
         if (mat.textureID >= 0) {
           mat.baseColor = texture(ballTextures[mat.textureID],
                                   sphereUV(hitNormal, ballIndex))

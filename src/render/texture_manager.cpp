@@ -1,6 +1,9 @@
 #include "texture_manager.h"
 #include <fstream>
+#include <iostream>
+#include <set>
 #include <stdexcept>
+#include "raw_image.h"
 
 TextureManager& TextureManager::GetInstance() {
   static TextureManager instance;
@@ -11,26 +14,93 @@ void TextureManager::Initialize() {
   // Получаем список всех ожидаемых имён объектов из sphere.json
   std::ifstream sphere_file(sphere_json_path_);
   if (!sphere_file.is_open()) {
-    throw std::runtime_error("Cannot open sphere.json");
-  }
-  json sphere_data = json::parse(sphere_file);
-
-  std::vector<std::string> expected_names;
-  for (const auto& item : sphere_data) {
-    if (item.contains("name") && item["name"].is_string()) {
-      expected_names.emplace_back(item["name"].get<std::string>());
+    std::cerr << "Warning: Cannot open sphere.json for texture check."
+              << std::endl;
+  } else {
+    json sphere_data = json::parse(sphere_file);
+    std::vector<std::string> expected_names;
+    for (const auto& item : sphere_data) {
+      if (item.contains("name") && item["name"].is_string()) {
+        expected_names.emplace_back(item["name"].get<std::string>());
+      }
     }
-  }
-
-  bool need_generate = CheckNeedsGeneration(expected_names);
-
-  // Если чего-то не хватает — запускаем Python-скрипт
-  if (need_generate) {
-    GenerateTextures();
+    // Если чего-то не хватает — запускаем Python-скрипт
+    if (CheckNeedsGeneration(expected_names)) {
+      GenerateTextures();
+    }
   }
 
   // Загружаем манифест после возможной генерации
   LoadManifest();
+}
+
+Texture* TextureManager::GetTexture(const std::string& name) {
+  if (name.empty()) {
+    return nullptr;
+  }
+
+  // Проверяем кэш уже загруженных текстур
+  if (loaded_textures_.count(name)) {
+    return loaded_textures_[name].get();
+  }
+
+  std::string cleanName = std::filesystem::path(name).filename().string();
+  if (loaded_textures_.count(cleanName)) {
+    return loaded_textures_[cleanName].get();
+  }
+
+  // Локальный кэш ошибок (чтобы не спамить консоль повторяющимися сообщениями)
+  static std::set<std::string> reported_missing;
+  if (reported_missing.count(name) || reported_missing.count(cleanName)) {
+    return nullptr;
+  }
+
+  // Определяем реальный путь к файлу
+  std::string finalPath;
+
+  // Ищем в манифесте по короткому имени
+  auto itManifest = texture_paths_.find(cleanName);
+  if (itManifest != texture_paths_.end()) {
+    finalPath = itManifest->second;
+  }
+  // Проверяем прямой путь
+  else if (std::filesystem::exists(name)) {
+    finalPath = name;
+  }
+  // Проверяем путь относительно папки текстур
+  else {
+    std::filesystem::path p = std::filesystem::path(textures_dir_) / cleanName;
+    if (std::filesystem::exists(p)) {
+      finalPath = p.string();
+    }
+  }
+
+  if (finalPath.empty()) {
+    std::cerr << "TextureManager Error: Could not find file for '" << name
+              << "'" << std::endl;
+    reported_missing.insert(name);  // Запоминаем ошибку
+    return nullptr;
+  }
+
+  // Загружаем изображение и создаём текстуру
+  try {
+    RawImage img = loadFromBMP(finalPath);
+
+    auto newTexture = std::make_unique<Texture>(img);
+    newTexture->createTexture();
+
+    Texture* ptr = newTexture.get();
+
+    // Кэшируем под исходным именем
+    loaded_textures_[name] = std::move(newTexture);
+
+    return ptr;
+  } catch (const std::exception& e) {
+    std::cerr << "TextureManager Error: Failed to load BMP '" << finalPath
+              << "': " << e.what() << std::endl;
+    reported_missing.insert(name);
+    return nullptr;
+  }
 }
 
 const std::string& TextureManager::GetTexturePath(
@@ -43,6 +113,7 @@ const std::string& TextureManager::GetTexturePath(
 }
 
 void TextureManager::Shutdown() {
+  loaded_textures_.clear();
   texture_paths_.clear();
 }
 

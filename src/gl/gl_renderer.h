@@ -13,12 +13,13 @@ class GLRenderer {
 
   bool Initialize();
   void Render(const Shader& shader, const Texture& texture);
-  void BindTexture(const Texture& texture);
   void UpdateUniforms(const Scene& scene, Shader& shader);
 
  private:
   SDL_GLContext glContext_;
   GLuint VAO_, VBO_, EBO_;
+  GLuint uboBalls_;
 
   void SetupQuad();
+  void BindTexture(const Texture& texture);
 };
