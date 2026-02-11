@@ -53,7 +53,10 @@ add_executable(Engine
  src/render/camera.cpp
  src/render/camera_parser.h
  src/render/camera_parser.cpp
+ src/render/gpu_data.h
  src/render/json_utils.h
+ src/render/material_converter.h
+ src/render/material_converter.cpp
  src/render/material_pbr.h
  src/render/material_pbr.cpp
  src/render/material_phong.h

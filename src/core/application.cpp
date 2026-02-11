@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include "physics/physics_body.h"
+#include "render/material_converter.h"
 #include "render/raw_image.h"
 #include "render/texture_manager.h"
 
@@ -93,15 +94,9 @@ bool Application::Initialize() {
   dummyTexture_->createTexture();
 
   // Настройка материалов, текстур и uniform'ов для бильярдных шаров
-  if (!AppUtils::InitRaymarchBallResources(sceneLoader_->GetScene(),
-                                           *raymarchShader_, ballTextures_,
-                                           ballMaterialsGPU_)) {
-    std::cerr << "Failed to init raymarch ball resources\n";
-    return false;
+  if (raymarchShader_) {
+    MaterialConverter::InitShaderSamplers(*raymarchShader_);
   }
-
-  // Привязываем текстуры шаров
-  AppUtils::BindBallTextures(ballTextures_, *raymarchShader_);
 
   // Данные для расчета FPS
   lastTime_ = SDL_GetTicks();

@@ -1,6 +1,7 @@
 #include "gl_renderer.h"
 #include <iostream>
 #include "render/app_utils.h"
+#include "render/material_converter.h"
 #include "render/scene_entity.h"
 #include "render/scene_object_sphere.h"
 
@@ -35,6 +36,16 @@ bool GLRenderer::Initialize() {
   }
 
   SetupQuad();
+
+  // === Создание UBO ===
+  glGenBuffers(1, &uboBalls_);
+  glBindBuffer(GL_UNIFORM_BUFFER, uboBalls_);
+  // Выделяем память
+  glBufferData(GL_UNIFORM_BUFFER, sizeof(UBOData), nullptr, GL_DYNAMIC_DRAW);
+  // Привязываем буфер к точке привязки (Binding Point) 0
+  glBindBufferBase(GL_UNIFORM_BUFFER, 0, uboBalls_);
+  glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
   return true;
 }
 
@@ -65,53 +76,74 @@ void GLRenderer::BindTexture(const Texture& texture) {
 void GLRenderer::UpdateUniforms(const Scene& scene, Shader& shader) {
   shader.use();
 
-  // Итерация по всем сущностям
+  // Связываем индекс блока в шейдере с точкой привязки 0
+  unsigned int blockIndex = glGetUniformBlockIndex(shader.getID(), "BallBlock");
+  glUniformBlockBinding(shader.getID(), blockIndex, 0);
+
+  // Подготовка данных на CPU
+  UBOData uboData;
+  // Обнуляем память, чтобы в паддингах не было мусора
+  std::memset(&uboData, 0, sizeof(UBOData));
+
+  uboData.ballCount = 0;
+  uboData.ballRadius = 0.0f;
+
   const auto& entities = scene.GetEntities();
   for (const auto& entity : entities) {
-    if (entity->object) {
-      entity->object->UpdateUniforms(shader);
+    if (!entity->object) {
+      continue;
     }
-  }
 
-  // Собираем массив позиций для шаров
-  std::vector<vec3> ballPositions;
-  std::vector<mat3<float>> ballRotations;
-  for (const auto& entity : entities) {
-    if (entity->object) {
-      if (auto* sphere = dynamic_cast<Sphere*>(entity->object.get())) {
-        ballPositions.push_back(sphere->GetRenderPosition());
-        quat q;
-        if (entity->body) {
-          q = entity->body->orientation;
-        }
-        ballRotations.push_back(quatToMat3(q));
+    if (auto* sphere = dynamic_cast<Sphere*>(entity->object.get())) {
+      if (uboData.ballCount >= 16) {  // Лимит массива в шейдере
+        break;
       }
+
+      int i = uboData.ballCount;
+
+      if (uboData.ballRadius == 0.0f) {
+        uboData.ballRadius = sphere->GetRadius();
+      }
+
+      // Копирование позиции
+      vec3 pos = sphere->GetRenderPosition();
+      uboData.balls[i].px = pos[0];
+      uboData.balls[i].py = pos[1];
+      uboData.balls[i].pz = pos[2];
+
+      // Копирование матрицы вращения (Конвертация quat -> mat3 -> 3x vec4)
+      quat q = (entity->body) ? entity->body->orientation : quat(1, 0, 0, 0);
+      mat3<float> R = quatToMat3(q);
+      // Столбец 0
+      uboData.balls[i].rotCol0[0] = R[0][0];
+      uboData.balls[i].rotCol0[1] = R[1][0];
+      uboData.balls[i].rotCol0[2] = R[2][0];
+      // Столбец 1
+      uboData.balls[i].rotCol1[0] = R[0][1];
+      uboData.balls[i].rotCol1[1] = R[1][1];
+      uboData.balls[i].rotCol1[2] = R[2][1];
+      // Столбец 2
+      uboData.balls[i].rotCol2[0] = R[0][2];
+      uboData.balls[i].rotCol2[1] = R[1][2];
+      uboData.balls[i].rotCol2[2] = R[2][2];
+
+      // Конвертация материала
+      const Material& mat = sphere->GetMaterial();
+      const MaterialPBR* pbrMat = dynamic_cast<const MaterialPBR*>(&mat);
+      uboData.balls[i].material = MaterialConverter::Convert(pbrMat, i);
+
+      uboData.ballCount++;
     }
   }
 
-  // Передаём массив в шейдер
-  int count = static_cast<int>(ballPositions.size());
-  if (count > 16) {
-    std::cerr << "Too many spheres: " << count << " (max 16)\n";
-    count = 16;
+  if (uboData.ballRadius == 0.0f) {
+    uboData.ballRadius = 1.35f;
   }
 
-  for (int i = 0; i < count; ++i) {
-    std::string idx = "[" + std::to_string(i) + "]";
-    shader.setVec3("ballPositions" + idx, ballPositions[i]);
-    mat3<float> R = ballRotations[i];
-    float flatMat[9] = {
-        R[0][0], R[0][1], R[0][2],  // 1-я строка
-        R[1][0], R[1][1], R[1][2],  // 2-я строка
-        R[2][0], R[2][1], R[2][2]   // 3-я строка
-    };
-
-    // Передаем как матрицу
-    shader.setMat3("ballRotations" + idx, flatMat);
-  }
-
-  // Обновляем количество
-  shader.setInt("ballCount", count);
+  // === Отправка данных в GPU ===
+  glBindBuffer(GL_UNIFORM_BUFFER, uboBalls_);
+  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(UBOData), &uboData);
+  glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GLRenderer::SetupQuad() {

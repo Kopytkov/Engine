@@ -1,7 +1,11 @@
+#pragma once
+
 #include <filesystem>
 #include <map>
+#include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
+#include "texture.h"
 
 using json = nlohmann::json;
 
@@ -9,6 +13,7 @@ class TextureManager {
  public:
   static TextureManager& GetInstance();
   void Initialize();
+  Texture* GetTexture(const std::string& name);
   const std::string& GetTexturePath(const std::string& name) const;
   void Shutdown();
 
@@ -29,6 +34,8 @@ class TextureManager {
   void GenerateTextures();
 
   std::map<std::string, std::string> texture_paths_;  // Кэш путей из манифеста
+  std::map<std::string, std::unique_ptr<Texture>>
+      loaded_textures_;  // Кэш загруженных GPU текстур
 
   const std::string textures_dir_ = "assets/textures";
   const std::string sphere_json_path_ = "assets/scene/objects/sphere.json";
